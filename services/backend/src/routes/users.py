@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
+import logging
 
 from tortoise.contrib.fastapi import HTTPNotFoundError
 
@@ -20,10 +21,15 @@ from src.auth.jwthandler import (
 
 
 router = APIRouter()
+# Настройка логгера
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+
 
 
 @router.post("/register", response_model=UserOutSchema)
 async def create_user(user: UserInSchema) -> UserOutSchema:
+    logger.info(f'test')
     return await crud.create_user(user)
 
 

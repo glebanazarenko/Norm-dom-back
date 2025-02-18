@@ -11,7 +11,7 @@ from tortoise.exceptions import DoesNotExist
 
 from src.schemas.token import TokenData
 from src.schemas.users import UserOutSchema
-from src.database.models import Users
+from src.database.models import User
 
 
 SECRET_KEY = os.environ.get("SECRET_KEY")
@@ -84,7 +84,7 @@ async def get_current_user(token: str = Depends(security)):
 
     try:
         user = await UserOutSchema.from_queryset_single(
-            Users.get(username=token_data.username)
+            User.get(username=token_data.username)
         )
     except DoesNotExist:
         raise credentials_exception

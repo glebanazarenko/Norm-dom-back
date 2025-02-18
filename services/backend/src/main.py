@@ -4,6 +4,12 @@ from tortoise import Tortoise
 
 from src.database.register import register_tortoise
 from src.database.config import TORTOISE_ORM
+import logging
+
+# Глобальная настройка логирования
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logger = logging.getLogger(__name__)
+
 
 
 # enable schemas to read relationship between models
@@ -14,7 +20,7 @@ import 'from src.routes import users, notes' must be after 'Tortoise.init_models
 why?
 https://stackoverflow.com/questions/65531387/tortoise-orm-for-python-no-returns-relations-of-entities-pyndantic-fastapi
 """
-from src.routes import users, notes
+from src.routes import users
 
 app = FastAPI()
 
@@ -26,7 +32,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(users.router)
-app.include_router(notes.router)
 
 register_tortoise(app, config=TORTOISE_ORM, generate_schemas=False)
 

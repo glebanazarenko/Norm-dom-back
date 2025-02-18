@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from tortoise.exceptions import DoesNotExist
 
-from src.database.models import Users
+from src.database.models import User
 from src.schemas.users import UserDatabaseSchema
 
 
@@ -19,7 +19,7 @@ def get_password_hash(password):
 
 
 async def get_user(username: str):
-    return await UserDatabaseSchema.from_queryset_single(Users.get(username=username))
+    return await UserDatabaseSchema.from_queryset_single(User.get(username=username))
 
 
 async def validate_user(user: OAuth2PasswordRequestForm = Depends()):

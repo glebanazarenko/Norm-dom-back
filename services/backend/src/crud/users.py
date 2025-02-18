@@ -1,39 +1,59 @@
 from fastapi import HTTPException
 from passlib.context import CryptContext
 from tortoise.exceptions import DoesNotExist, IntegrityError
+import logging
 
-from src.database.models import Users
+
+from src.database.models import User, Role
 from src.schemas.token import Status  # NEW
 from src.schemas.users import UserOutSchema
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Настройка логгера
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 async def create_user(user) -> UserOutSchema:
+    logger.info(f"Начало создания пользователя: {user.username}")
     user.password = pwd_context.encrypt(user.password)
 
     # Проверяем, существует ли уже такой пользователь
-    existing_user = await Users.filter(username=user.username).first()
+    existing_user = await User.filter(username=user.username).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="Username already exists.")
+    
+    user_dict = user.dict(exclude_unset=True)
 
+    if "role_id" not in user_dict:
+        default_role = await Role.get(role_name='User')  # Получаем объект роли
+        user_dict["role_id"] = default_role.id  # Передаем `id`, а не объект
+
+    logger.info(f'User data: {user_dict}')
     try:
-        user_obj = await Users.create(**user.dict(exclude_unset=True))
-    except IntegrityError:
-        raise HTTPException(status_code=401, detail=f"Sorry, that username already exists.")
+        user_obj = await User.create(
+            username=user_dict["username"],
+            full_name=user_dict.get("full_name"),
+            email=user_dict["email"],
+            password=user_dict["password"],
+            role_id=user_dict["role_id"],
+        )
+    except IntegrityError as err:
+        logger.error(f"Ошибка создания пользователя: {err}")
+        raise HTTPException(status_code=400, detail=str(err))
 
     return await UserOutSchema.from_tortoise_orm(user_obj)
 
 
 async def delete_user(user_id, current_user) -> Status:  # UPDATED
     try:
-        db_user = await UserOutSchema.from_queryset_single(Users.get(id=user_id))
+        db_user = await UserOutSchema.from_queryset_single(User.get(id=user_id))
     except DoesNotExist:
         raise HTTPException(status_code=404, detail=f"User {user_id} not found")
 
     if db_user.id == current_user.id:
-        deleted_count = await Users.filter(id=user_id).delete()
+        deleted_count = await User.filter(id=user_id).delete()
         if not deleted_count:
             raise HTTPException(status_code=404, detail=f"User {user_id} not found")
         return Status(message=f"Deleted user {user_id}")  # UPDATED
