@@ -34,3 +34,18 @@ docker-compose logs backend -f
 docker-compose exec backend sh
 uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload
 uvicorn src.main:app --host 0.0.0.0 --port 5035 --reload
+
+TODO:
+
+Написать скрипт, который переносить из cvs в raw_addresses.  А оттуда во все таблицы
+
+Сделать поиск домов, комментарии, роль администратора и вип пользователя.
+
+Добавить карту
+
+Добавить фильтры, личный кабинет
+
+Cделал:
+
+Сделай id UUID, обновил вход и выход из аакаунта без ошибок (куки обновил и убрал notes)
+Поправил удаление пользователя

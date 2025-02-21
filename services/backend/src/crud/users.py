@@ -47,11 +47,13 @@ async def create_user(user) -> UserOutSchema:
 
 
 async def delete_user(user_id, current_user) -> Status:  # UPDATED
+    logger.info(f"Начало удаления пользователя: {current_user.username}")
     try:
         db_user = await UserOutSchema.from_queryset_single(User.get(id=user_id))
     except DoesNotExist:
         raise HTTPException(status_code=404, detail=f"User {user_id} not found")
-
+    logger.info(f'User data: {db_user}')
+    logger.info(f'User current: {current_user}')
     if db_user.id == current_user.id:
         deleted_count = await User.filter(id=user_id).delete()
         if not deleted_count:

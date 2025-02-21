@@ -1,33 +1,22 @@
 from tortoise import fields, models
+import uuid
 
 
 # Пример простых кастомных полей для работы с геоданными.
 # Здесь они унаследованы от TextField для хранения строкового представления WKT.
 # В реальном проекте следует реализовать полноценную сериализацию/десериализацию.
 class GeometryField(fields.TextField):
-    """
-    Поле для хранения геометрического объекта (например, полигон в формате WKT).
-    Ожидается, что данные будут храниться в формате GEOMETRY(Polygon,4326).
-    """
+    """ Поле для хранения геометрического объекта (например, полигон в формате WKT). """
     pass
 
 
 class PointField(fields.TextField):
-    """
-    Поле для хранения точки (например, центральная точка объекта) в формате WKT.
-    Ожидается, что данные будут храниться в формате GEOMETRY(Point,4326).
-    """
+    """ Поле для хранения точки (например, центральная точка объекта) в формате WKT. """
     pass
 
 
 class RawAddress(models.Model):
-    """
-    Таблица для сырого хранения загруженных CSV-данных.
-    Здесь можно хранить все исходные данные в формате JSON.
-    """
-    id = fields.IntField(pk=True)
-    # В данном случае все данные сохраняются в одном поле.
-    # При необходимости можно добавить отдельные поля, соответствующие колонкам CSV.
+    id = fields.UUIDField(pk=True, default=uuid.uuid4)  # UUID вместо IntField
     raw_data = fields.JSONField()
 
     class Meta:
@@ -38,10 +27,7 @@ class RawAddress(models.Model):
 
 
 class AdmArea(models.Model):
-    """
-    Справочник административных округов.
-    """
-    id = fields.IntField(pk=True)
+    id = fields.UUIDField(pk=True, default=uuid.uuid4)
     name = fields.CharField(max_length=255, unique=True)
 
     class Meta:
@@ -52,10 +38,7 @@ class AdmArea(models.Model):
 
 
 class District(models.Model):
-    """
-    Справочник муниципальных округов/поселений.
-    """
-    id = fields.IntField(pk=True)
+    id = fields.UUIDField(pk=True, default=uuid.uuid4)
     name = fields.CharField(max_length=255, unique=True)
 
     class Meta:
@@ -66,25 +49,20 @@ class District(models.Model):
 
 
 class House(models.Model):
-    """
-    Основная таблица объектов недвижимости.
-    """
-    id = fields.IntField(pk=True)
+    id = fields.UUIDField(pk=True, default=uuid.uuid4)
     unom = fields.CharField(max_length=255, unique=True)
-    obj_type = fields.CharField(max_length=100)  # Например: "Здание"
-    full_address = fields.TextField()            # Полное юридическое описание
-    simple_address = fields.TextField()          # Упрощённое описание
+    obj_type = fields.CharField(max_length=100)
+    full_address = fields.TextField()
+    simple_address = fields.TextField()
 
-    # Внешние ключи на справочники
-    adm_area = fields.ForeignKeyField("models.AdmArea", related_name="houses")
-    district = fields.ForeignKeyField("models.District", related_name="houses")
+    adm_area = fields.ForeignKeyField("models.AdmArea", related_name="houses", to_field="id")
+    district = fields.ForeignKeyField("models.District", related_name="houses", to_field="id")
 
-    kad_n = fields.TextField()            # Кадастровый номер объекта недвижимости
-    kad_zu = fields.TextField(null=True)    # Кадастровый номер земельного участка (если имеется)
+    kad_n = fields.TextField()
+    kad_zu = fields.TextField(null=True)
 
-    # Геоданные с использованием кастомных полей для PostGIS
-    geo_data = GeometryField(null=True)         # GEOMETRY(Polygon,4326) – полигон объекта
-    geodata_center = PointField(null=True)        # GEOMETRY(Point,4326) – центральная точка
+    geo_data = GeometryField(null=True)
+    geodata_center = PointField(null=True)
 
     created_at = fields.DatetimeField(auto_now_add=True)
     updated_at = fields.DatetimeField(auto_now=True)
@@ -97,10 +75,7 @@ class House(models.Model):
 
 
 class Role(models.Model):
-    """
-    Справочник ролей пользователей.
-    """
-    id = fields.IntField(pk=True)
+    id = fields.UUIDField(pk=True, default=uuid.uuid4)
     role_name = fields.CharField(max_length=50, unique=True)
 
     class Meta:
@@ -111,15 +86,13 @@ class Role(models.Model):
 
 
 class User(models.Model):
-    """
-    Таблица пользователей. Каждый пользователь имеет одну роль.
-    """
-    id = fields.IntField(pk=True)
+    id = fields.UUIDField(pk=True, default=uuid.uuid4)
     username = fields.CharField(max_length=20, unique=True)
     full_name = fields.CharField(max_length=50, null=True)
     email = fields.CharField(max_length=255, unique=True)
     password = fields.CharField(max_length=128, null=True)
-    role = fields.ForeignKeyField("models.Role", related_name="users")
+    role = fields.ForeignKeyField("models.Role", related_name="users", to_field="id")
+
     created_at = fields.DatetimeField(auto_now_add=True)
     modified_at = fields.DatetimeField(auto_now=True)
 
@@ -131,13 +104,10 @@ class User(models.Model):
 
 
 class Review(models.Model):
-    """
-    Отзывы пользователей к объектам недвижимости.
-    """
-    id = fields.IntField(pk=True)
-    house = fields.ForeignKeyField("models.House", related_name="reviews")
-    user = fields.ForeignKeyField("models.User", related_name="reviews")
-    rating = fields.IntField()       # Например, значение от 1 до 5
+    id = fields.UUIDField(pk=True, default=uuid.uuid4)
+    house = fields.ForeignKeyField("models.House", related_name="reviews", to_field="id")
+    user = fields.ForeignKeyField("models.User", related_name="reviews", to_field="id")
+    rating = fields.IntField() # от 1 до 5
     review_text = fields.TextField()
     created_at = fields.DatetimeField(auto_now_add=True)
 

@@ -5,6 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 import logging
+import uuid
 
 from tortoise.contrib.fastapi import HTTPNotFoundError
 
@@ -57,8 +58,8 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
         httponly=True,
         max_age=1800,
         expires=1800,
-        samesite="Lax",
-        secure=False,
+        samesite="None",  # <-- Меняем Lax на None
+        secure=True,  # <-- Должно быть True, иначе не работает с SameSite=None
     )
 
     return response
@@ -78,6 +79,7 @@ async def read_users_me(current_user: UserOutSchema = Depends(get_current_user))
     dependencies=[Depends(get_current_user)],
 )
 async def delete_user(
-    user_id: int, current_user: UserOutSchema = Depends(get_current_user)
+    user_id: uuid.UUID, current_user: UserOutSchema = Depends(get_current_user)
 ) -> Status:
+    logger.info(f'test')
     return await crud.delete_user(user_id, current_user)
