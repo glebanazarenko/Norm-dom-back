@@ -51,14 +51,14 @@ class District(models.Model):
 class House(models.Model):
     id = fields.UUIDField(pk=True, default=uuid.uuid4)
     unom = fields.CharField(max_length=255, unique=True)
-    obj_type = fields.CharField(max_length=100)
+    obj_type = fields.CharField(max_length=100, null=True)
     full_address = fields.TextField()
     simple_address = fields.TextField()
 
     adm_area = fields.ForeignKeyField("models.AdmArea", related_name="houses", to_field="id")
     district = fields.ForeignKeyField("models.District", related_name="houses", to_field="id")
 
-    kad_n = fields.TextField()  # Кадастровый номер объекта недвижимости
+    kad_n = fields.TextField(null=True)  # Кадастровый номер объекта недвижимости
     kad_zu = fields.TextField(null=True)  # Кадастровый номер земельного участка (если имеется)
 
     geo_data = GeometryField(null=True)

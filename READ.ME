@@ -28,6 +28,16 @@ docker-compose exec backend aerich upgrade
 
 docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev
 
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "\dt"
+
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select count(*) from raw_addresses"
+
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select count(*) from houses"
+
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select count(*) from districts"
+
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select count(*) from adm_areas"
+
 
 Посмотреть логи
 
@@ -42,12 +52,14 @@ uvicorn src.main:app --host 0.0.0.0 --port 5035 --reload
 https://github.com/glebanazarenko/Norm-dom-back
 https://github.com/glebanazarenko/Norm-dom-front
 
+Запуск команд из-под докера
+
+docker-compose exec backend python /app/src/process_raw_addresses.py
+
 
 TODO:
 
 Нужно написать выполнение перенос данных в бд от администратора
-
-Написать скрипт, который переносить из cvs в raw_addresses.  А оттуда во все таблицы
 
 Сделать поиск домов, комментарии, роль администратора и вип пользователя.
 
@@ -64,3 +76,6 @@ Cделал:
 Написал скрипт, который делает перенос данных из json в raw_addresses. Ускорил его с 1 часа до 1,5 минуты.
 
 Сделал запуск миграций и добавление в бд при запуске приложения.
+
+Сделал скрипт, что из raw_addresses переносить в таблицы houses, districts, adm_areas с проверкой на уникальность
+
