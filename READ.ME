@@ -2,6 +2,10 @@
 
 docker-compose up -d --build
 
+docker-compose down
+
+Удаление томов
+
 docker-compose down -v
 
 При первом создании
@@ -35,7 +39,13 @@ docker-compose exec backend sh
 uvicorn src.main:app --host 0.0.0.0 --port 5000 --reload
 uvicorn src.main:app --host 0.0.0.0 --port 5035 --reload
 
+https://github.com/glebanazarenko/Norm-dom-back
+https://github.com/glebanazarenko/Norm-dom-front
+
+
 TODO:
+
+Нужно написать выполнение перенос данных в бд от администратора
 
 Написать скрипт, который переносить из cvs в raw_addresses.  А оттуда во все таблицы
 
@@ -49,3 +59,8 @@ Cделал:
 
 Сделай id UUID, обновил вход и выход из аакаунта без ошибок (куки обновил и убрал notes)
 Поправил удаление пользователя
+Сделал 4 роли в миграции и фото добавил туда же
+
+Написал скрипт, который делает перенос данных из json в raw_addresses. Ускорил его с 1 часа до 1,5 минуты.
+
+Сделал запуск миграций и добавление в бд при запуске приложения.
