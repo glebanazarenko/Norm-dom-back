@@ -6,13 +6,24 @@ import logging
 
 from src.database.models import User, Role
 from src.schemas.token import Status  # NEW
-from src.schemas.users import UserOutSchema
+from src.schemas.users import UserOutSchema, UserFrontSchema
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 # Настройка логгера
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
+
+
+async def get_user(username) -> UserFrontSchema:
+    user_data = await User.filter(username=username).select_related('role').first()
+
+    if user_data:
+        # Создаем схему с использованием from_tortoise_orm для правильной сериализации
+        return await UserFrontSchema.from_tortoise_orm(UserFrontSchema.from_orm(user_data))
+    
+    # Возвращаем ошибку, если пользователь не найден
+    raise HTTPException(status_code=400, detail="Нет такого пользователя")
 
 
 async def create_user(user) -> UserOutSchema:

@@ -38,6 +38,11 @@ docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select cou
 
 docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select count(*) from adm_areas"
 
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select * from users"
+
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select * from roles"
+
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "UPDATE users SET role_id = (SELECT id FROM roles WHERE role_name = 'Admin') WHERE username = '1';"
 
 Посмотреть логи
 
@@ -58,6 +63,11 @@ docker-compose exec backend python /app/src/process_raw_addresses.py
 
 
 TODO:
+
+Смена верхней панели в зависимости от роли, которая есть у человека.
+
+У админа будет еще Заполнить БД. И туда перенести мои фунции init_db, process_raw_addresses. И написать фукнкцию, которая будет закачивать последную версию файлов из сайта.
+
 
 Нужно написать выполнение перенос данных в бд от администратора
 

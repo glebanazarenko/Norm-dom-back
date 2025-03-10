@@ -12,7 +12,7 @@ from tortoise.contrib.fastapi import HTTPNotFoundError
 import src.crud.users as crud
 from src.auth.users import validate_user
 from src.schemas.token import Status
-from src.schemas.users import UserInSchema, UserOutSchema
+from src.schemas.users import UserInSchema, UserOutSchema, UserFrontSchema
 
 from src.auth.jwthandler import (
     create_access_token,
@@ -30,7 +30,6 @@ logger.setLevel(logging.INFO)
 
 @router.post("/register", response_model=UserOutSchema)
 async def create_user(user: UserInSchema) -> UserOutSchema:
-    logger.info(f'test')
     return await crud.create_user(user)
 
 
@@ -71,6 +70,12 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
 async def read_users_me(current_user: UserOutSchema = Depends(get_current_user)):
     return current_user
 
+
+@router.get(
+    "/users/getuser", response_model=UserFrontSchema, dependencies=[Depends(get_current_user)]
+)
+async def read_users_me(current_user: UserOutSchema = Depends(get_current_user)):
+    return await crud.get_user(current_user.username)
 
 @router.delete(
     "/user/{user_id}",
