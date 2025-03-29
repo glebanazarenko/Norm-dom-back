@@ -13,7 +13,7 @@ async def db_connection():
         },
         "apps": {
             "models": {
-                "models": ["database.models"],
+                "models": ["src.database.models"],
                 "default_connection": "default",
             }
         },

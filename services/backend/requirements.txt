@@ -10,3 +10,5 @@ uvicorn==0.20.0
 asyncio
 ijson
 shapely
+selenium
+webdriver_manager

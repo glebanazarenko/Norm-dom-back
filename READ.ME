@@ -34,6 +34,8 @@ docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select cou
 
 docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select count(*) from houses"
 
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select * from houses LIMIT 1"
+
 docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select count(*) from districts"
 
 docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select count(*) from adm_areas"
@@ -64,18 +66,13 @@ docker-compose exec backend python /app/src/process_raw_addresses.py
 
 TODO:
 
-Смена верхней панели в зависимости от роли, которая есть у человека.
-
-У админа будет еще Заполнить БД. И туда перенести мои фунции init_db, process_raw_addresses. И написать фукнкцию, которая будет закачивать последную версию файлов из сайта.
-
-
-Нужно написать выполнение перенос данных в бд от администратора
-
 Сделать поиск домов, комментарии, роль администратора и вип пользователя.
 
 Добавить карту
 
 Добавить фильтры, личный кабинет
+
+И написать фукнкцию, которая будет закачивать последную версию файлов из сайта.
 
 Cделал:
 
@@ -89,3 +86,10 @@ Cделал:
 
 Сделал скрипт, что из raw_addresses переносить в таблицы houses, districts, adm_areas с проверкой на уникальность
 
+Смена верхней панели в зависимости от роли, которая есть у человека.
+
+У админа будет еще Заполнить БД
+
+И туда перенести мои фунции init_db, process_raw_addresses.
+
+Сказать данные. Загрузить данные в бд. Обновить данные о домах в бд.
