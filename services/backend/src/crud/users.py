@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from passlib.context import CryptContext
 from tortoise.exceptions import DoesNotExist, IntegrityError
-import logging
+from src.main import logger
 
 
 from src.database.models import User, Role
@@ -10,9 +10,6 @@ from src.schemas.users import UserOutSchema, UserFrontSchema
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-# Настройка логгера
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 async def get_user(username) -> UserFrontSchema:

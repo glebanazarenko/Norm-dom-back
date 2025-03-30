@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
-import logging
+from src.main import logger
 import uuid
 
 from tortoise.contrib.fastapi import HTTPNotFoundError
@@ -22,9 +22,6 @@ from src.auth.jwthandler import (
 
 
 router = APIRouter()
-# Настройка логгера
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
 
 
 
