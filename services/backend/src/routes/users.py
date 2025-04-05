@@ -5,6 +5,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from src.main import logger
+from fastapi import Depends
 import uuid
 
 from tortoise.contrib.fastapi import HTTPNotFoundError

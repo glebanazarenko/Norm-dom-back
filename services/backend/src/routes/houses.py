@@ -4,6 +4,10 @@ import src.crud.houses as crud
 from src.schemas.houses import HouseOutSchema
 from src.main import logger
 from uuid import UUID
+from src.schemas.users import UserOutSchema
+from src.schemas.houses import ReviewCreateSchema
+
+from src.auth.jwthandler import get_current_user
 
 router = APIRouter()
 
@@ -25,9 +29,17 @@ async def get_house_by_id(id: UUID):
         raise HTTPException(status_code=404, detail="Дом не найден")
     return house
 
-@router.post("/house/{id}/reviews", response_model=HouseOutSchema)
-async def add_review_to_house(id: UUID, review_data: str, rating: int):
-    house = await crud.add_review_to_house(id, review_data, rating)
+@router.post("/house/{id}/reviews", response_model=HouseOutSchema, dependencies=[Depends(get_current_user)])
+async def add_review_to_house(
+    id: UUID,
+    review_data: ReviewCreateSchema,  # Используем схему для валидации
+    current_user: UserOutSchema = Depends(get_current_user)
+):
+    logger.info(f"Получены данные: {review_data}")
+    house = await crud.add_review_to_house(
+        id, review_data.review_data, review_data.rating, current_user
+    )
+    logger.info(f"Дом: {house}")
     if not house:
         raise HTTPException(status_code=404, detail="Дом не найден")
     return house

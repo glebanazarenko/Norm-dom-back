@@ -1,5 +1,6 @@
 from tortoise.contrib.pydantic import pydantic_model_creator
 from src.database.models import House
+from pydantic import BaseModel
 
 # Схема для входных данных (если потребуется создание дома)
 HouseInSchema = pydantic_model_creator(
@@ -29,6 +30,18 @@ HouseDatabaseSchema = pydantic_model_creator(
     exclude=("geo_data", "geodata_center"),
 )
 
+# Схема для создания отзыва
+class ReviewCreateSchema(BaseModel):
+    review_data: str
+    rating: int
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "review_data": "Отличный дом!",
+                "rating": 5,
+            }
+        }
 
 # class HouseFrontSchema(UserOutFrontSchema):
 #     role_name: str

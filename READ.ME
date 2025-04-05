@@ -44,6 +44,8 @@ docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select * f
 
 docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select * from roles"
 
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select * from reviews LIMIT 1"
+
 docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "UPDATE users SET role_id = (SELECT id FROM roles WHERE role_name = 'Admin') WHERE username = '1';"
 
 Посмотреть логи
@@ -66,7 +68,7 @@ docker-compose exec backend python /app/src/process_raw_addresses.py
 
 TODO:
 
-Сделать роль администратора и вип пользователя.
+Сделать роль вип пользователя.
 
 Добавить карту
 
@@ -97,4 +99,4 @@ Cделал:
 
 Сказать данные. Загрузить данные в бд. Обновить данные о домах в бд.
 
-Сделал поиск домов и страницу с домов
+Сделал поиск домов и страницу с домов. Сделал добавить отзыв
