@@ -13,7 +13,7 @@ async def db_connection():
         },
         "apps": {
             "models": {
-                "models": ["src.database.models"],
+                "models": ["src.database.models", "aerich.models"],  # Укажите полный путь к моделям
                 "default_connection": "default",
             }
         },

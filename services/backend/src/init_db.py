@@ -1,6 +1,5 @@
 import json
 import asyncio
-import os
 from tortoise import Tortoise, run_async
 from database.models import RawAddress
 from decimal import Decimal
@@ -76,7 +75,7 @@ async def main():
     """
     async with db_connection():
         # Укажите путь к вашему JSON-файлу с данными
-        file_path = "src/data-60562-2025-02-23.json"
+        file_path = "src/json/data-60562-2025-04-04.json"
         await load_raw_addresses(file_path)
 
 

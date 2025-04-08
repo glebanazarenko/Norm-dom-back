@@ -1,10 +1,7 @@
 from fastapi import HTTPException
-from passlib.context import CryptContext
-from tortoise.exceptions import DoesNotExist, IntegrityError
 from src.main import logger
 from typing import List
 from tortoise.expressions import Q
-from tortoise.queryset import QuerySet
 from src.database.models import House, Review, User
 from src.schemas.houses import HouseOutSchema
 from uuid import UUID
@@ -20,7 +17,8 @@ async def get_house(query: str, page: int = 1, per_page: int = 10) -> List[House
     houses = await House.filter(
         Q(unom__icontains=query) |
         Q(full_address__icontains=query) |
-        Q(simple_address__icontains=query)
+        Q(simple_address__icontains=query)  |
+        Q(full_address__icontains=query)
     ).offset(offset).limit(per_page).all()
 
     if houses:
