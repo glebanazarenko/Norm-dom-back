@@ -26,7 +26,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8081", "http://127.0.0.1:8081", "http://localhost:5000", "http://127.0.0.1:5000"],
+    allow_origins=["http://localhost:8081", "http://127.0.0.1:8081", "http://localhost:5001", "http://127.0.0.1:5001"],
     allow_credentials=True,  # <-- Должно быть True, иначе `cookies` не работают
     allow_methods=["*"],  # Разрешаем все методы (GET, POST, OPTIONS и т. д.)
     allow_headers=["*"],  # Разрешаем все заголовки

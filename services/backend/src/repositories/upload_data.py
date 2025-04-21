@@ -25,6 +25,7 @@ def read_json_in_chunks(file_path: str, chunk_size: int = 1000):
     Генератор, который считывает JSON-файл (в формате массива объектов)
     и возвращает данные порциями по chunk_size записей.
     """
+    logger.info("Начинаю обработку файла")
     with open(file_path, 'r', encoding='cp1251') as f:
         data = json.load(f)  # Загружаем весь файл
         for i in range(0, len(data), chunk_size):
@@ -47,6 +48,8 @@ async def load_raw_addresses(file_path: str):
         async for chunk in async_iter(read_json_in_chunks(file_path)):
             # Преобразуем каждую запись (например, заменяя Decimal на float)
             records = [convert_decimals(record) for record in chunk]
+
+            logger.info(f"Кол-во записей {len(records)}")
 
             # Фильтруем записи: оставляем только те, которых нет в базе
             new_records = [
