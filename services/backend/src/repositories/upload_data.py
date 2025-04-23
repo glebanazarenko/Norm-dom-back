@@ -49,8 +49,6 @@ async def load_raw_addresses(file_path: str):
             # Преобразуем каждую запись (например, заменяя Decimal на float)
             records = [convert_decimals(record) for record in chunk]
 
-            logger.info(f"Кол-во записей {len(records)}")
-
             # Фильтруем записи: оставляем только те, которых нет в базе
             new_records = [
                 RawAddress(raw_data=record)

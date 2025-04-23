@@ -48,6 +48,8 @@ docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "Select * f
 
 docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "UPDATE users SET role_id = (SELECT id FROM roles WHERE role_name = 'Admin') WHERE username = '1';"
 
+docker-compose exec db psql -U hello_fastapi -d hello_fastapi_dev -c "UPDATE users SET role_id = (SELECT id FROM roles WHERE role_name = 'Super User') WHERE username = '2';"
+
 Посмотреть логи
 
 docker-compose logs backend -f
@@ -68,7 +70,7 @@ docker-compose exec backend python /app/src/process_raw_addresses.py
 
 TODO:
 
-Модерация сообщений, блокировка пользователя админом
+блокировка пользователя админом
 
 Функционал вип пользователя
 
@@ -108,3 +110,5 @@ Cделал:
 Сделал вип пользователя. 
 
 Добавить карту
+
+Модерация сообщений

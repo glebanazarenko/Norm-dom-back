@@ -20,6 +20,7 @@ async def search_houses(query: str):
 
     return houses
 
+
 @router.get("/house/{id}", response_model=HouseOutSchema)
 async def get_house_by_id(id: UUID):
     logger.info(f'Дома {id}')
@@ -28,6 +29,7 @@ async def get_house_by_id(id: UUID):
     if not house:
         raise HTTPException(status_code=404, detail="Дом не найден")
     return house
+
 
 @router.post("/house/{id}/reviews", response_model=HouseOutSchema, dependencies=[Depends(get_current_user)])
 async def add_review_to_house(

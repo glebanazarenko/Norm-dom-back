@@ -10,7 +10,7 @@ import uuid
 
 from tortoise.contrib.fastapi import HTTPNotFoundError
 
-import src.crud.users as crud
+import src.crud.users as crud_users
 from src.auth.users import validate_user
 from src.schemas.token import Status
 from src.schemas.users import UserInSchema, UserOutSchema, UserFrontSchema
@@ -28,7 +28,7 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserOutSchema)
 async def create_user(user: UserInSchema) -> UserOutSchema:
-    return await crud.create_user(user)
+    return await crud_users.create_user(user)
 
 
 @router.post("/login")
@@ -73,7 +73,7 @@ async def read_users_me(current_user: UserOutSchema = Depends(get_current_user))
     "/users/getuser", response_model=UserFrontSchema, dependencies=[Depends(get_current_user)]
 )
 async def read_users_me(current_user: UserOutSchema = Depends(get_current_user)):
-    return await crud.get_user(current_user.username)
+    return await crud_users.get_user(current_user.username)
 
 @router.delete(
     "/user/{user_id}",
@@ -85,4 +85,4 @@ async def delete_user(
     user_id: uuid.UUID, current_user: UserOutSchema = Depends(get_current_user)
 ) -> Status:
     logger.info(f'test')
-    return await crud.delete_user(user_id, current_user)
+    return await crud_users.delete_user(user_id, current_user)

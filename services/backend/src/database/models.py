@@ -1,5 +1,6 @@
 from tortoise import fields, models
 import uuid
+from datetime import datetime, timezone
 
 
 # Пример простых кастомных полей для работы с геоданными.
@@ -109,7 +110,11 @@ class Review(models.Model):
     user = fields.ForeignKeyField("models.User", related_name="reviews", to_field="id")
     rating = fields.IntField()  # от 1 до 5
     review_text = fields.TextField()
+    is_published = fields.BooleanField(default=False)
+    is_deleted = fields.BooleanField(default=False)
+
     created_at = fields.DatetimeField(auto_now_add=True)
+    modified_at = fields.DatetimeField(auto_now=True)
 
     class Meta:
         table = "reviews"

@@ -2,10 +2,11 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from tortoise.exceptions import DoesNotExist, IntegrityError
 from src.main import logger
+from uuid import UUID
 
 
 from src.database.models import User, Role
-from src.schemas.token import Status  # NEW
+from src.schemas.token import Status
 from src.schemas.users import UserOutSchema, UserFrontSchema
 
 
@@ -22,6 +23,8 @@ async def get_user(username) -> UserFrontSchema:
     # Возвращаем ошибку, если пользователь не найден
     raise HTTPException(status_code=400, detail="Нет такого пользователя")
 
+async def get(id: UUID):
+    return await User.get(id=id)
 
 async def create_user(user) -> UserOutSchema:
     logger.info(f"Начало создания пользователя: {user.username}")
