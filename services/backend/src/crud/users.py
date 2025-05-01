@@ -28,7 +28,7 @@ async def get(id: UUID):
 
 async def create_user(user) -> UserOutSchema:
     logger.info(f"Начало создания пользователя: {user.username}")
-    user.password = pwd_context.encrypt(user.password)
+    user.password = pwd_context.hash(user.password)
 
     # Проверяем, существует ли уже такой пользователь
     existing_user = await User.filter(username=user.username).first()

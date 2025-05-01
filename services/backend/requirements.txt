@@ -11,3 +11,7 @@ asyncio
 ijson
 shapely
 webdriver_manager
+pytest
+pytest-asyncio
+pyjwt
+httpx==0.23.3
