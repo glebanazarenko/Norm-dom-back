@@ -37,11 +37,22 @@ async def client():
 
 
 @pytest_asyncio.fixture
-async def user():
-    role = await Role.create(role_name="User")
+async def user(role_user):
     encrypt_password = pwd_context.hash("password_user")
-    user = await User.create(username="User", email="User@example.com", password=encrypt_password, role=role)
+    user = await User.create(username="User", email="User@example.com", password=encrypt_password, role=role_user)
     return user
+
+@pytest_asyncio.fixture
+async def another_user(role_user):
+    encrypt_password = pwd_context.hash("password_user")
+    obj = await User.create(
+        username="anotheruser",
+        full_name="Another User",
+        email="another@example.com",
+        password=encrypt_password,
+        role=role_user
+    )
+    return obj
 
 @pytest_asyncio.fixture
 async def role_user():

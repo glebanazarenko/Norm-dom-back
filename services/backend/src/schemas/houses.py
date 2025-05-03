@@ -32,13 +32,13 @@ HouseDatabaseSchema = pydantic_model_creator(
 
 # Схема для создания отзыва
 class ReviewCreateSchema(BaseModel):
-    review_data: str
+    review_text: str
     rating: int
 
     class Config:
         schema_extra = {
             "example": {
-                "review_data": "Отличный дом!",
+                "review_text": "Отличный дом!",
                 "rating": 5,
             }
         }

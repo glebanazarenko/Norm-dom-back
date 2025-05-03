@@ -11,7 +11,7 @@ async def test_moderate_review_approve_success(review, client, mock_authenticate
 
     # Выполнение запроса
     response = await client.post("/review/moderate", json=data)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Ошибка: {response.json()}"
 
     # Проверка результата
     json_response = response.json()
@@ -26,7 +26,7 @@ async def test_moderate_review_reject_success(review, client, mock_authenticated
     }
 
     response = await client.post("/review/moderate", json=data)
-    assert response.status_code == 200
+    assert response.status_code == 200, f"Ошибка: {response.json()}"
 
     json_response = response.json()
     assert json_response["is_published"] is False
@@ -40,7 +40,7 @@ async def test_moderate_review_invalid_action(review, client, mock_authenticated
     }
 
     response = await client.post("/review/moderate", json=data)
-    assert response.status_code == 400
+    assert response.status_code == 400, f"Ошибка: {response.json()}"
     assert response.json() == {"detail": "Недопустимое действие"}
 
 @pytest.mark.asyncio
@@ -51,7 +51,7 @@ async def test_moderate_review_not_found(client, mock_authenticated_admin):
     }
 
     response = await client.post("/review/moderate", json=data)
-    assert response.status_code == 404
+    assert response.status_code == 404, f"Ошибка: {response.json()}"
     assert response.json() == {"detail": "Отзыв не найден"}
 
 
@@ -63,7 +63,7 @@ async def test_moderate_review_unauthorized(review, client, mock_authenticated_u
     }
 
     response = await client.post("/review/moderate", json=data)
-    assert response.status_code == 403
+    assert response.status_code == 403, f"Ошибка: {response.json()}"
     assert response.json() == {"detail": "Access denied: Admins only"}
 
 @pytest.mark.asyncio
@@ -74,6 +74,6 @@ async def test_moderate_review_unauthorized(review, client, mock_authenticated_s
     }
 
     response = await client.post("/review/moderate", json=data)
-    assert response.status_code == 403
+    assert response.status_code == 403, f"Ошибка: {response.json()}"
     assert response.json() == {"detail": "Access denied: Admins only"}
 

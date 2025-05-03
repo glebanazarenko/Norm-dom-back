@@ -2,8 +2,12 @@ import pytest
 import jwt
 
 from src.crud.users import pwd_context
-from src.database.models import User, Role, House, Review, AdmArea, District
+from src.database.models import User
 from src.auth.jwthandler import SECRET_KEY, ALGORITHM
+
+from uuid import uuid4
+from src.crud.users import get_user, delete_user_by_id, get
+from src.database.models import User
 
 @pytest.mark.asyncio
 async def test_login(client, user, superuser, admin):
@@ -93,86 +97,46 @@ async def test_register_existing_username(client, user):
     assert response.status_code == 400, f"Ошибка: {response.json()}"
 
 
+@pytest.mark.asyncio
+async def test_delete_user_success(client, user, mock_authenticated_user):
+    response = await client.delete(f"/user/{user.id}")
+    assert response.status_code == 200, f"Ошибка: {response.json()}"
+    data = response.json()
+    assert data["message"] == f"Deleted user {str(user.id)}"
 
-# @pytest.mark.asyncio
-# async def test_admin_cannot_edit_review(superuser, admin, house, client):
-#     # Создаем отзыв под суперпользователем
-#     review = await Review.create(house=house, user=superuser, rating=4, review_text="Nice house!")
+@pytest.mark.asyncio
+async def test_delete_user_not_found(client, user, mock_authenticated_user):
+    fake_id = uuid4()
+    response = await client.delete(f"/user/{fake_id}")
+    assert response.status_code == 404, f"Ошибка: {response.json()}"
+    assert response.json()["detail"] == f"Пользователь {str(fake_id)} не найден"
 
-#     # Пытаемся изменить отзыв под админом
-#     admin_token = create_access_token({"sub": "admin"})
-#     headers = {"Authorization": f"Bearer {admin_token}"}
+@pytest.mark.asyncio
+async def test_delete_user_unauthorized(client, another_user):
+    response = await client.delete(f"/user/{another_user.id}")
+    assert response.status_code == 401, f"Ошибка: {response.json()}"
+    assert response.json()["detail"] == "Not authenticated"
 
-#     response = client.post(
-#         "/review/edit",
-#         json={"review_id": str(review.id), "new_rating": 3, "new_review_text": "Not so nice"},
-#         headers=headers
-#     )
-#     assert response.status_code == 403  # Доступ запрещен
+@pytest.mark.asyncio
+async def test_delete_wrong_user(client, another_user, mock_authenticated_superuser):
+    response = await client.delete(f"/user/{another_user.id}")
+    assert response.status_code == 403, f"Ошибка: {response.json()}"
+    assert response.json()["detail"] == "Not authorized to delete"
 
-# @pytest.mark.asyncio
-# async def test_admin_approve_review(superuser, admin, house, client):
-#     # Создаем отзыв под суперпользователем
-#     review = await Review.create(house=house, user=superuser, rating=4, review_text="Nice house!")
+@pytest.mark.asyncio
+async def test_get_user_found(user):
+    result = await get_user(user.username)
+    assert result.username == user.username
 
-#     # Одобряем отзыв под админом
-#     admin_token = create_access_token({"sub": "admin"})
-#     headers = {"Authorization": f"Bearer {admin_token}"}
+@pytest.mark.asyncio
+async def test_get_user_by_id(user):
+    result = await get(user.id)
+    assert result.id == user.id
+    assert result.username == user.username
 
-#     response = client.post(
-#         "/review/moderate",
-#         json={"review_id": str(review.id), "action": "approve"},
-#         headers=headers
-#     )
-#     assert response.status_code == 200
-
-#     # Проверяем, что отзыв опубликован
-#     updated_review = await Review.get(id=review.id)
-#     assert updated_review.is_published
-
-
-# @pytest.mark.asyncio
-# async def test_superuser_edit_approved_review(superuser, admin, house, client):
-#     # Создаем отзыв под суперпользователем
-#     review = await Review.create(house=house, user=superuser, rating=4, review_text="Nice house!")
-
-#     # Одобряем отзыв под админом
-#     admin_token = create_access_token({"sub": "admin"})
-#     headers = {"Authorization": f"Bearer {admin_token}"}
-
-#     response = client.post(
-#         "/review/moderate",
-#         json={"review_id": str(review.id), "action": "approve"},
-#         headers=headers
-#     )
-#     assert response.status_code == 200
-
-#     # Пытаемся изменить отзыв под суперпользователем
-#     superuser_token = create_access_token({"sub": "superuser"})
-#     headers = {"Authorization": f"Bearer {superuser_token}"}
-
-#     response = client.post(
-#         "/review/edit",
-#         json={"review_id": str(review.id), "new_rating": 3, "new_review_text": "Updated review"},
-#         headers=headers
-#     )
-#     assert response.status_code == 400  # Нельзя изменять опубликованный отзыв
-
-# @pytest.mark.asyncio
-# async def test_admin_delete_review(superuser, admin, house, client):
-#     # Создаем отзыв под суперпользователем
-#     review = await Review.create(house=house, user=superuser, rating=4, review_text="Nice house!")
-
-#     # Удаляем отзыв под админом
-#     admin_token = create_access_token({"sub": "admin"})
-#     headers = {"Authorization": f"Bearer {admin_token}"}
-
-#     response = client.delete(
-#         f"/review/{review.id}",
-#         headers=headers
-#     )
-#     assert response.status_code == 200
-
-#     # Проверяем, что отзыв удален
-#     deleted_review = await Review.get_or_none(id=review.id)
-#     assert deleted_review.is_deleted
+@pytest.mark.asyncio
+async def test_delete_user_by_id(user):
+    count = await delete_user_by_id(user.id)
+    assert count == 1
+    result = await User.get_or_none(id=user.id)
+    assert result is None

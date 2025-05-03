@@ -4,13 +4,12 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from src.main import logger
 from fastapi import Depends
 import uuid
 
 from tortoise.contrib.fastapi import HTTPNotFoundError
 
-import src.crud.users as crud_users
+from src.services.users import create_user_with_logic, get_user_with_logic, delete_user_with_logic
 from src.auth.users import validate_user
 from src.schemas.token import Status
 from src.schemas.users import UserInSchema, UserOutSchema, UserFrontSchema
@@ -28,7 +27,12 @@ router = APIRouter()
 
 @router.post("/register", response_model=UserOutSchema)
 async def create_user(user: UserInSchema) -> UserOutSchema:
-    return await crud_users.create_user(user)
+    try:
+        return await create_user_with_logic(user)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 
 @router.post("/login")
@@ -66,14 +70,24 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
     "/users/whoami", response_model=UserOutSchema, dependencies=[Depends(get_current_user)]
 )
 async def read_users_me(current_user: UserOutSchema = Depends(get_current_user)):
-    return current_user
+    try:
+        return current_user
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 
 @router.get(
     "/users/getuser", response_model=UserFrontSchema, dependencies=[Depends(get_current_user)]
 )
 async def read_users_me(current_user: UserOutSchema = Depends(get_current_user)):
-    return await crud_users.get_user(current_user.username)
+    try:
+        return await get_user_with_logic(current_user.username)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 @router.delete(
     "/user/{user_id}",
@@ -84,5 +98,9 @@ async def read_users_me(current_user: UserOutSchema = Depends(get_current_user))
 async def delete_user(
     user_id: uuid.UUID, current_user: UserOutSchema = Depends(get_current_user)
 ) -> Status:
-    logger.info(f'test')
-    return await crud_users.delete_user(user_id, current_user)
+    try:
+        return await delete_user_with_logic(user_id, current_user.id)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
