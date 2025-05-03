@@ -1,8 +1,7 @@
-from tortoise.contrib.pydantic import pydantic_model_creator
-from src.database.models import House
-from pydantic import BaseModel
-from uuid import UUID
 from datetime import datetime
+from uuid import UUID
+
+from pydantic import BaseModel
 
 
 class EditReviewSchema(BaseModel):

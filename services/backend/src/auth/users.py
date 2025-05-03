@@ -1,11 +1,10 @@
-from fastapi import HTTPException, Depends, status
+from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 from tortoise.exceptions import DoesNotExist
 
 from src.database.models import User
 from src.schemas.users import UserDatabaseSchema
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -1,6 +1,7 @@
+from uuid import UUID
+
 from fastapi import HTTPException
 from passlib.context import CryptContext
-from uuid import UUID
 
 from src.database.models import User
 from src.schemas.users import UserFrontSchema

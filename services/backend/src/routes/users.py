@@ -1,25 +1,19 @@
+import uuid
 from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import Depends
-import uuid
-
 from tortoise.contrib.fastapi import HTTPNotFoundError
 
-from src.services.users import create_user_with_logic, get_user_with_logic, delete_user_with_logic
+from src.auth.jwthandler import (ACCESS_TOKEN_EXPIRE_MINUTES,
+                                 create_access_token, get_current_user)
 from src.auth.users import validate_user
 from src.schemas.token import Status
-from src.schemas.users import UserInSchema, UserOutSchema, UserFrontSchema
-
-from src.auth.jwthandler import (
-    create_access_token,
-    get_current_user,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-)
-
+from src.schemas.users import UserFrontSchema, UserInSchema, UserOutSchema
+from src.services.users import (create_user_with_logic, delete_user_with_logic,
+                                get_user_with_logic)
 
 router = APIRouter()
 

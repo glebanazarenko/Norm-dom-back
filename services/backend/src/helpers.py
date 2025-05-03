@@ -1,6 +1,8 @@
-from contextlib import asynccontextmanager
-from tortoise import Tortoise
 import os
+from contextlib import asynccontextmanager
+
+from tortoise import Tortoise
+
 
 @asynccontextmanager
 async def db_connection():

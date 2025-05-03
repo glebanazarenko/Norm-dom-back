@@ -1,6 +1,7 @@
-from tortoise import run_async
-from src.database.models import RawAddress, AdmArea, District, House
 from shapely.geometry import shape
+from tortoise import run_async
+
+from src.database.models import AdmArea, District, House, RawAddress
 from src.helpers import db_connection
 from src.main import logger
 

@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
+
 from src.auth.jwthandler import get_current_user
-from src.schemas.users import UserOutSchema
 from src.schemas.reviews import EditReviewSchema, ReviewOutSchema
-from src.services.users import is_super_user
+from src.schemas.users import UserOutSchema
 from src.services.reviews import edit_review
+from src.services.users import is_super_user
 
 router = APIRouter()
 

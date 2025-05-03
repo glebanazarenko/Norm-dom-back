@@ -1,6 +1,7 @@
-from tortoise.contrib.pydantic import pydantic_model_creator
-from src.database.models import House
 from pydantic import BaseModel
+from tortoise.contrib.pydantic import pydantic_model_creator
+
+from src.database.models import House
 
 # Схема для входных данных (если потребуется создание дома)
 HouseInSchema = pydantic_model_creator(

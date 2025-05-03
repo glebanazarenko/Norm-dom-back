@@ -1,13 +1,12 @@
-import pytest
-import jwt
-
-from src.crud.users import pwd_context
-from src.database.models import User
-from src.auth.jwthandler import SECRET_KEY, ALGORITHM
-
 from uuid import uuid4
-from src.crud.users import get_user, delete_user_by_id, get
+
+import jwt
+import pytest
+
+from src.auth.jwthandler import ALGORITHM, SECRET_KEY
+from src.crud.users import delete_user_by_id, get, get_user, pwd_context
 from src.database.models import User
+
 
 @pytest.mark.asyncio
 async def test_login(client, user, superuser, admin):

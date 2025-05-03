@@ -1,8 +1,6 @@
-from fastapi import HTTPException, Depends
-from src.main import logger
-from src.database.models import Review
 from uuid import UUID
-from src.schemas.users import UserOutSchema
+
+from src.database.models import Review
 
 
 async def create(house, user, rating: int, review_text: str):

@@ -1,5 +1,6 @@
-from pathlib import Path
 import json
+from pathlib import Path
+
 
 def convert_json_to_new_format(input_json_path, output_json_path):
     try:

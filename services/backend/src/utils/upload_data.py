@@ -1,8 +1,10 @@
-import json
 import asyncio
-from tortoise import Tortoise, run_async
-from src.database.models import RawAddress
+import json
 from decimal import Decimal
+
+from tortoise import Tortoise, run_async
+
+from src.database.models import RawAddress
 from src.helpers import db_connection
 from src.main import logger
 

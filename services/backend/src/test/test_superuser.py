@@ -1,5 +1,7 @@
 import pytest
+
 from src.database.models import Review
+
 
 @pytest.mark.asyncio
 async def test_edit_review_success(review_superuser, client, superuser, mock_authenticated_superuser):

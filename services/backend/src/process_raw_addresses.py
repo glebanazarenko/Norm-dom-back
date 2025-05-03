@@ -1,8 +1,10 @@
-from tortoise import run_async
-from database.models import RawAddress, AdmArea, District, House
-from shapely.geometry import shape
-from helpers import db_connection
 import logging
+
+from shapely.geometry import shape
+from tortoise import run_async
+
+from database.models import AdmArea, District, House, RawAddress
+from helpers import db_connection
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

@@ -1,5 +1,6 @@
 from tortoise import BaseDBAsyncClient
 
+
 async def upgrade(db: BaseDBAsyncClient) -> str:
     return """
     INSERT INTO "roles" ("id", "role_name") VALUES 

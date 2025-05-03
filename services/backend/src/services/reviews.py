@@ -1,7 +1,11 @@
-from src.schemas.reviews import ModerateReviewSchema, ReviewOutSchema, EditReviewSchema
-from src.crud.reviews import update_review_status, get_review_by_id_and_user, update_review
-from fastapi import HTTPException
 from uuid import UUID
+
+from fastapi import HTTPException
+
+from src.crud.reviews import (get_review_by_id_and_user, update_review,
+                              update_review_status)
+from src.schemas.reviews import (EditReviewSchema, ModerateReviewSchema,
+                                 ReviewOutSchema)
 
 
 async def moderate_review(data: ModerateReviewSchema) -> ReviewOutSchema:

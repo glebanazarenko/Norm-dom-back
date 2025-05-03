@@ -1,12 +1,14 @@
-from fastapi import HTTPException
-from src.crud.users import get_first_user, get_user, create_user_in_db, delete_user_by_id, get
-from src.crud.roles import get_role
-from src.schemas.users import UserOutSchema
-from tortoise.exceptions import IntegrityError, DoesNotExist
-from passlib.context import CryptContext
-from src.schemas.users import UserInSchema, UserOutSchema, UserFrontSchema
 from uuid import UUID
+
+from fastapi import HTTPException
+from passlib.context import CryptContext
+from tortoise.exceptions import DoesNotExist, IntegrityError
+
+from src.crud.roles import get_role
+from src.crud.users import (create_user_in_db, delete_user_by_id, get,
+                            get_first_user, get_user)
 from src.schemas.token import Status
+from src.schemas.users import UserFrontSchema, UserInSchema, UserOutSchema
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

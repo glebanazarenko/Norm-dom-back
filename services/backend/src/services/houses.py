@@ -1,13 +1,15 @@
-from fastapi import HTTPException, Depends
-from src.main import logger
 from typing import List
-from src.schemas.houses import HouseOutSchema
 from uuid import UUID
+
+from fastapi import HTTPException
 from tortoise.exceptions import IntegrityError
-from src.schemas.users import UserOutSchema
-from src.crud.houses import get_or_none, get_house, get_house_by_id
-import src.crud.users as crud_user
+
 import src.crud.reviews as crud_reviews
+import src.crud.users as crud_user
+from src.crud.houses import get_house, get_house_by_id, get_or_none
+from src.main import logger
+from src.schemas.houses import HouseOutSchema
+from src.schemas.users import UserOutSchema
 
 
 async def add_review_to_house_with_logic(id: UUID, review_text: str, rating: int, current_user: UserOutSchema) -> HouseOutSchema:

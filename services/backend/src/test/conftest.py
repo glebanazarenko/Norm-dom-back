@@ -1,13 +1,12 @@
+import httpx
 import pytest_asyncio
 from tortoise import Tortoise
-import httpx
 
-from src.main import app
-from src.database.models import User, Role, House, Review, AdmArea, District
-from src.crud.users import pwd_context
-from src.schemas.users import UserOutSchema
 from src.auth.jwthandler import get_current_user
-
+from src.crud.users import pwd_context
+from src.database.models import AdmArea, District, House, Review, Role, User
+from src.main import app
+from src.schemas.users import UserOutSchema
 
 TORTOISE_ORM = {
     "connections": {"default": "sqlite://:memory:"},  # Используйте SQLite в памяти для тестов

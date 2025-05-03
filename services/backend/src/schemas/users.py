@@ -2,7 +2,6 @@ from tortoise.contrib.pydantic import pydantic_model_creator
 
 from src.database.models import User
 
-
 UserInSchema = pydantic_model_creator(
     User, name="UserIn", include=("username", "full_name", 'email', "password"),
 )

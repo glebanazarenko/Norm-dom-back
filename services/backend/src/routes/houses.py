@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException
 from typing import List
-from src.schemas.houses import HouseOutSchema
 from uuid import UUID
-from src.schemas.users import UserOutSchema
-from src.schemas.houses import ReviewCreateSchema
-from src.services.houses import get_searched_houses, get_house_by_id_with_logic, add_review_to_house_with_logic
+
+from fastapi import APIRouter, Depends, HTTPException
+
 from src.auth.jwthandler import get_current_user
+from src.schemas.houses import HouseOutSchema, ReviewCreateSchema
+from src.schemas.users import UserOutSchema
+from src.services.houses import (add_review_to_house_with_logic,
+                                 get_house_by_id_with_logic,
+                                 get_searched_houses)
 
 router = APIRouter()
 

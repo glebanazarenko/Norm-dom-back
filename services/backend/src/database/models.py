@@ -1,6 +1,6 @@
-from tortoise import fields, models
 import uuid
-from datetime import datetime, timezone
+
+from tortoise import fields, models
 
 
 # Пример простых кастомных полей для работы с геоданными.

@@ -1,10 +1,11 @@
+import logging
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise import Tortoise
 
-from src.database.register import register_tortoise
 from src.database.config import TORTOISE_ORM
-import logging
+from src.database.register import register_tortoise
 
 # Глобальная настройка логирования
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
@@ -20,7 +21,7 @@ import 'from src.routes import users, notes' must be after 'Tortoise.init_models
 why?
 https://stackoverflow.com/questions/65531387/tortoise-orm-for-python-no-returns-relations-of-entities-pyndantic-fastapi
 """
-from src.routes import users, admin, houses, super_user
+from src.routes import admin, houses, super_user, users
 
 app = FastAPI()
 
