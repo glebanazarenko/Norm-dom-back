@@ -54,7 +54,7 @@ async def create_user_with_logic(user: UserInSchema) -> UserOutSchema:
 
 
 async def get_user_with_logic(username: str) -> UserFrontSchema:
-    user = get_user(username)
+    user = await get_user(username)
     if not user:
         raise HTTPException(status_code=400, detail="Нет такого пользователя")
     return user

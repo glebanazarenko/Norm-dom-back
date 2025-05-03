@@ -128,6 +128,7 @@ async def test_delete_wrong_user(client, another_user, mock_authenticated_superu
 async def test_get_user_found(user):
     result = await get_user(user.username)
     assert result.username == user.username
+    assert result.role_name == user.role.role_name
 
 
 @pytest.mark.asyncio
@@ -143,3 +144,18 @@ async def test_delete_user_by_id(user):
     assert count == 1
     result = await User.get_or_none(id=user.id)
     assert result is None
+
+
+@pytest.mark.asyncio
+async def test_read_users_me_success(client, mock_authenticated_user):
+    response = await client.get("/users/getuser")
+    assert response.status_code == 200
+    # Проверьте структуру ответа, если необходимо
+    assert "role_name" in response.json()
+
+
+@pytest.mark.asyncio
+async def test_read_users_me_unauthorized(client):
+    response = await client.get("/users/getuser")
+    assert response.status_code == 401
+    assert response.json() == {"detail": "Not authenticated"}
