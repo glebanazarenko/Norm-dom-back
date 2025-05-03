@@ -71,6 +71,10 @@ docker-compose exec backend pytest /app/src/test/
 
 docker-compose exec backend isort .
 
+docker-compose exec backend pylint src/
+
+./services/backend/format.sh
+
 
 TODO:
 

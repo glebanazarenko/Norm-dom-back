@@ -11,19 +11,25 @@ async def db_connection():
     """
     config = {
         "connections": {
-            "default": os.environ.get("DATABASE_URL", "postgres://hello_fastapi:hello_fastapi@localhost:5432/hello_fastapi_dev")
+            "default": os.environ.get(
+                "DATABASE_URL",
+                "postgres://hello_fastapi:hello_fastapi@localhost:5432/hello_fastapi_dev",
+            )
         },
         "apps": {
             "models": {
-                "models": ["src.database.models", "aerich.models"],  # Укажите полный путь к моделям
+                "models": [
+                    "src.database.models",
+                    "aerich.models",
+                ],  # Укажите полный путь к моделям
                 "default_connection": "default",
             }
         },
     }
-    
+
     await Tortoise.init(config=config)
     await Tortoise.generate_schemas()
-    
+
     try:
         yield Tortoise
     finally:

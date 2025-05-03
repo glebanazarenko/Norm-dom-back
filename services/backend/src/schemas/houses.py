@@ -14,7 +14,14 @@ HouseInSchema = pydantic_model_creator(
 HouseOutFrontSchema = pydantic_model_creator(
     House,
     name="HouseOutFront",
-    exclude=("geo_data", "geodata_center", "kad_n", "kad_zu", "created_at", "updated_at"),
+    exclude=(
+        "geo_data",
+        "geodata_center",
+        "kad_n",
+        "kad_zu",
+        "created_at",
+        "updated_at",
+    ),
 )
 
 # Схема для полного представления дома (для админов)
@@ -31,6 +38,7 @@ HouseDatabaseSchema = pydantic_model_creator(
     exclude=("geo_data", "geodata_center"),
 )
 
+
 # Схема для создания отзыва
 class ReviewCreateSchema(BaseModel):
     review_text: str
@@ -43,6 +51,7 @@ class ReviewCreateSchema(BaseModel):
                 "rating": 5,
             }
         }
+
 
 # class HouseFrontSchema(UserOutFrontSchema):
 #     role_name: str

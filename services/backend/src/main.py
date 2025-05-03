@@ -8,9 +8,10 @@ from src.database.config import TORTOISE_ORM
 from src.database.register import register_tortoise
 
 # Глобальная настройка логирования
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
-
 
 
 # enable schemas to read relationship between models
@@ -27,7 +28,12 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8081", "http://127.0.0.1:8081", "http://localhost:5001", "http://127.0.0.1:5001"],
+    allow_origins=[
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
+        "http://localhost:5001",
+        "http://127.0.0.1:5001",
+    ],
     allow_credentials=True,  # <-- Должно быть True, иначе `cookies` не работают
     allow_methods=["*"],  # Разрешаем все методы (GET, POST, OPTIONS и т. д.)
     allow_headers=["*"],  # Разрешаем все заголовки

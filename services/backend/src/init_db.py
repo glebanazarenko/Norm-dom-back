@@ -14,9 +14,9 @@ def convert_decimals(obj):
     """
     if isinstance(obj, dict):
         return {k: convert_decimals(v) for k, v in obj.items()}
-    elif isinstance(obj, list):
+    if isinstance(obj, list):
         return [convert_decimals(item) for item in obj]
-    elif isinstance(obj, Decimal):
+    if isinstance(obj, Decimal):
         return float(obj)
     return obj
 
@@ -26,10 +26,10 @@ def read_json_in_chunks(file_path: str, chunk_size: int = 1000):
     Генератор, который считывает JSON-файл (в формате массива объектов)
     и возвращает данные порциями по chunk_size записей.
     """
-    with open(file_path, 'r', encoding='cp1251') as f:
+    with open(file_path, "r", encoding="cp1251") as f:
         data = json.load(f)  # Загружаем весь файл
         for i in range(0, len(data), chunk_size):
-            yield data[i:i + chunk_size]
+            yield data[i : i + chunk_size]
 
 
 async def load_raw_addresses(file_path: str):
@@ -53,7 +53,8 @@ async def load_raw_addresses(file_path: str):
             new_records = [
                 RawAddress(raw_data=record)
                 for record in records
-                if record.get("global_id") is None or record.get("global_id") not in existing_ids
+                if record.get("global_id") is None
+                or record.get("global_id") not in existing_ids
             ]
 
             if new_records:

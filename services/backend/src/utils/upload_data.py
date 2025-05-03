@@ -28,10 +28,10 @@ def read_json_in_chunks(file_path: str, chunk_size: int = 1000):
     и возвращает данные порциями по chunk_size записей.
     """
     logger.info("Начинаю обработку файла")
-    with open(file_path, 'r', encoding='cp1251') as f:
+    with open(file_path, "r", encoding="cp1251") as f:
         data = json.load(f)  # Загружаем весь файл
         for i in range(0, len(data), chunk_size):
-            yield data[i:i + chunk_size]
+            yield data[i : i + chunk_size]
 
 
 async def load_raw_addresses(file_path: str):
@@ -55,13 +55,16 @@ async def load_raw_addresses(file_path: str):
             new_records = [
                 RawAddress(raw_data=record)
                 for record in records
-                if record.get("global_id") is None or record.get("global_id") not in existing_ids
+                if record.get("global_id") is None
+                or record.get("global_id") not in existing_ids
             ]
 
             if new_records:
                 await RawAddress.bulk_create(new_records)
                 total_count += len(new_records)
-                logger.info(f"Добавлено записей: {len(new_records)}, Всего: {total_count}")
+                logger.info(
+                    f"Добавлено записей: {len(new_records)}, Всего: {total_count}"
+                )
             else:
                 logger.info("Нет новых данных для вставки в chunck")
 

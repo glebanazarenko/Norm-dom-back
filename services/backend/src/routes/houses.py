@@ -6,11 +6,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.auth.jwthandler import get_current_user
 from src.schemas.houses import HouseOutSchema, ReviewCreateSchema
 from src.schemas.users import UserOutSchema
-from src.services.houses import (add_review_to_house_with_logic,
-                                 get_house_by_id_with_logic,
-                                 get_searched_houses)
+from src.services.houses import (
+    add_review_to_house_with_logic,
+    get_house_by_id_with_logic,
+    get_searched_houses,
+)
 
 router = APIRouter()
+
 
 @router.get("/houses/search", response_model=List[HouseOutSchema])
 async def search_houses(query: str):
@@ -34,11 +37,15 @@ async def get_house_by_id(id: UUID):
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 
-@router.post("/house/{id}/reviews", response_model=HouseOutSchema, dependencies=[Depends(get_current_user)])
+@router.post(
+    "/house/{id}/reviews",
+    response_model=HouseOutSchema,
+    dependencies=[Depends(get_current_user)],
+)
 async def add_review_to_house(
     id: UUID,
     review_data: ReviewCreateSchema,  # Используем схему для валидации
-    current_user: UserOutSchema = Depends(get_current_user)
+    current_user: UserOutSchema = Depends(get_current_user),
 ):
     try:
         house = await add_review_to_house_with_logic(

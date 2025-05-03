@@ -12,10 +12,9 @@ from src.database.models import User
 async def test_login(client, user, superuser, admin):
     # Вход в систему
     login_response = await client.post(
-        "/login",
-        data={"username": user.username, "password": "password_user"}
+        "/login", data={"username": user.username, "password": "password_user"}
     )
-    assert login_response.status_code == 200, "Ошибка входа"    
+    assert login_response.status_code == 200, "Ошибка входа"
     # Извлечение токена
     assert "Authorization" in login_response.cookies
     auth_cookie = login_response.cookies.get("Authorization")
@@ -28,7 +27,7 @@ async def test_login(client, user, superuser, admin):
     # Вход в систему
     login_response = await client.post(
         "/login",
-        data={"username": superuser.username, "password": "password_superuser"}
+        data={"username": superuser.username, "password": "password_superuser"},
     )
     assert login_response.status_code == 200, "Ошибка входа"
     # Извлечение токена
@@ -42,8 +41,7 @@ async def test_login(client, user, superuser, admin):
 
     # Вход в систему
     login_response = await client.post(
-        "/login",
-        data={"username": admin.username, "password": "password_admin"}
+        "/login", data={"username": admin.username, "password": "password_admin"}
     )
     assert login_response.status_code == 200, "Ошибка входа"
     # Извлечение токена
@@ -62,7 +60,7 @@ async def test_register_user_success(client, role_user):
         "username": "new_user",
         "full_name": "New user",
         "email": "new@example.com",
-        "password": "SecurePass123!"
+        "password": "SecurePass123!",
     }
     response = await client.post("/register", json=user_data)
     assert response.status_code == 200, f"Ошибка: {response.json()}"
@@ -78,7 +76,7 @@ async def test_register_existing_email(client, user):
         "username": "existing_user",
         "full_name": "Exist user",
         "email": user.email,
-        "password": "SecurePass123!"
+        "password": "SecurePass123!",
     }
     response = await client.post("/register", json=user_data)
     assert response.status_code == 400, f"Ошибка: {response.json()}"
@@ -103,6 +101,7 @@ async def test_delete_user_success(client, user, mock_authenticated_user):
     data = response.json()
     assert data["message"] == f"Deleted user {str(user.id)}"
 
+
 @pytest.mark.asyncio
 async def test_delete_user_not_found(client, user, mock_authenticated_user):
     fake_id = uuid4()
@@ -110,11 +109,13 @@ async def test_delete_user_not_found(client, user, mock_authenticated_user):
     assert response.status_code == 404, f"Ошибка: {response.json()}"
     assert response.json()["detail"] == f"Пользователь {str(fake_id)} не найден"
 
+
 @pytest.mark.asyncio
 async def test_delete_user_unauthorized(client, another_user):
     response = await client.delete(f"/user/{another_user.id}")
     assert response.status_code == 401, f"Ошибка: {response.json()}"
     assert response.json()["detail"] == "Not authenticated"
+
 
 @pytest.mark.asyncio
 async def test_delete_wrong_user(client, another_user, mock_authenticated_superuser):
@@ -122,16 +123,19 @@ async def test_delete_wrong_user(client, another_user, mock_authenticated_superu
     assert response.status_code == 403, f"Ошибка: {response.json()}"
     assert response.json()["detail"] == "Not authorized to delete"
 
+
 @pytest.mark.asyncio
 async def test_get_user_found(user):
     result = await get_user(user.username)
     assert result.username == user.username
+
 
 @pytest.mark.asyncio
 async def test_get_user_by_id(user):
     result = await get(user.id)
     assert result.id == user.id
     assert result.username == user.username
+
 
 @pytest.mark.asyncio
 async def test_delete_user_by_id(user):

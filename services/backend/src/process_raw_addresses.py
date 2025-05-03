@@ -19,32 +19,44 @@ async def migrate_data():
             logger.info(f"Начинаю миграцию {total} записей")
 
             # Собираем все существующие UNOM из БД
-            existing_unoms_db = set(str(unom) for unom in await House.all().values_list('unom', flat=True))
+            existing_unoms_db = set(
+                str(unom) for unom in await House.all().values_list("unom", flat=True)
+            )
             logger.info(f"Найдено {len(existing_unoms_db)} существующих UNOM в БД")
 
             # Собираем уникальные административные округа и районы
             adm_area_names = set()
             district_names = set()
-            
+
             for raw in raw_addresses:
                 data = raw.raw_data
-                if 'ADM_AREA' in data:
-                    adm_area_names.add(data['ADM_AREA'])
-                if 'DISTRICT' in data:
-                    district_names.add(data['DISTRICT'])
+                if "ADM_AREA" in data:
+                    adm_area_names.add(data["ADM_AREA"])
+                if "DISTRICT" in data:
+                    district_names.add(data["DISTRICT"])
 
             # Создаем административные округа
-            existing_areas = set(await AdmArea.filter(name__in=adm_area_names).values_list('name', flat=True))
+            existing_areas = set(
+                await AdmArea.filter(name__in=adm_area_names).values_list(
+                    "name", flat=True
+                )
+            )
             new_areas = adm_area_names - existing_areas
             if new_areas:
                 await AdmArea.bulk_create([AdmArea(name=name) for name in new_areas])
             adm_areas = {a.name: a for a in await AdmArea.all()}
 
             # Создаем районы
-            existing_districts = set(await District.filter(name__in=district_names).values_list('name', flat=True))
+            existing_districts = set(
+                await District.filter(name__in=district_names).values_list(
+                    "name", flat=True
+                )
+            )
             new_districts = district_names - existing_districts
             if new_districts:
-                await District.bulk_create([District(name=name) for name in new_districts])
+                await District.bulk_create(
+                    [District(name=name) for name in new_districts]
+                )
             districts = {d.name: d for d in await District.all()}
 
             # Фильтруем и обрабатываем данные
@@ -53,13 +65,13 @@ async def migrate_data():
 
             for i, raw in enumerate(raw_addresses, 1):
                 data = raw.raw_data
-                raw_unom = data.get('UNOM')
-                
+                raw_unom = data.get("UNOM")
+
                 # Явное преобразование в строку
                 unom = str(raw_unom) if raw_unom is not None else None
 
                 # Пропускаем некорректные записи
-                if not all([unom, data.get('ADM_AREA'), data.get('DISTRICT')]):
+                if not all([unom, data.get("ADM_AREA"), data.get("DISTRICT")]):
                     continue
 
                 # Проверка уникальности
@@ -68,23 +80,23 @@ async def migrate_data():
 
                 try:
                     # Геоданные
-                    geo_data = data.get('geoData')
-                    geo_center = data.get('geodata_center')
+                    geo_data = data.get("geoData")
+                    geo_center = data.get("geodata_center")
                     geo_data_wkt = shape(geo_data).wkt if geo_data else None
                     geodata_center_wkt = shape(geo_center).wkt if geo_center else None
 
                     # Кадастровые номера
-                    kad_n = data['KAD_N'][0]['KAD_N'] if data.get('KAD_N') else None
-                    kad_zu = data['KAD_ZU'][0]['KAD_ZU'] if data.get('KAD_ZU') else None
+                    kad_n = data["KAD_N"][0]["KAD_N"] if data.get("KAD_N") else None
+                    kad_zu = data["KAD_ZU"][0]["KAD_ZU"] if data.get("KAD_ZU") else None
 
                     # Создаем объект дома
                     house = House(
                         unom=unom,
-                        obj_type=data.get('OBJ_TYPE', ''),
-                        full_address=data.get('ADDRESS', ''),
-                        simple_address=data.get('SIMPLE_ADDRESS', ''),
-                        adm_area=adm_areas[data['ADM_AREA']],
-                        district=districts[data['DISTRICT']],
+                        obj_type=data.get("OBJ_TYPE", ""),
+                        full_address=data.get("ADDRESS", ""),
+                        simple_address=data.get("SIMPLE_ADDRESS", ""),
+                        adm_area=adm_areas[data["ADM_AREA"]],
+                        district=districts[data["DISTRICT"]],
                         kad_n=kad_n,
                         kad_zu=kad_zu,
                         geo_data=geo_data_wkt,
@@ -115,5 +127,6 @@ async def migrate_data():
             logger.error(f"Критическая ошибка: {str(e)}")
             raise
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     run_async(migrate_data())

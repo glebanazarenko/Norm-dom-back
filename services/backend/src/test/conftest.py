@@ -9,20 +9,26 @@ from src.main import app
 from src.schemas.users import UserOutSchema
 
 TORTOISE_ORM = {
-    "connections": {"default": "sqlite://:memory:"},  # Используйте SQLite в памяти для тестов
+    "connections": {
+        "default": "sqlite://:memory:"
+    },  # Используйте SQLite в памяти для тестов
     "apps": {
         "models": {
-            "models": ["src.database.models", "aerich.models"],  # Укажите пути к моделям
+            "models": [
+                "src.database.models",
+                "aerich.models",
+            ],  # Укажите пути к моделям
             "default_connection": "default",
         }
     },
 }
 
+
 @pytest_asyncio.fixture(autouse=True)
 async def initialize_tests():
     await Tortoise.init(
         db_url="sqlite://:memory:",
-        modules={"models": ["src.database.models", "aerich.models"]}
+        modules={"models": ["src.database.models", "aerich.models"]},
     )
     await Tortoise.generate_schemas()
     yield
@@ -38,8 +44,14 @@ async def client():
 @pytest_asyncio.fixture
 async def user(role_user):
     encrypt_password = pwd_context.hash("password_user")
-    user = await User.create(username="User", email="User@example.com", password=encrypt_password, role=role_user)
+    user = await User.create(
+        username="User",
+        email="User@example.com",
+        password=encrypt_password,
+        role=role_user,
+    )
     return user
+
 
 @pytest_asyncio.fixture
 async def another_user(role_user):
@@ -49,9 +61,10 @@ async def another_user(role_user):
         full_name="Another User",
         email="another@example.com",
         password=encrypt_password,
-        role=role_user
+        role=role_user,
     )
     return obj
+
 
 @pytest_asyncio.fixture
 async def role_user():
@@ -63,7 +76,12 @@ async def superuser():
     role = await Role.create(role_name="Super User")
     encrypt_password = pwd_context.hash("password_superuser")
     # encrypt_password = pwd_context.hash("password_superuser")
-    user = await User.create(username="superuser", email="superuser@example.com", password=encrypt_password, role=role)
+    user = await User.create(
+        username="superuser",
+        email="superuser@example.com",
+        password=encrypt_password,
+        role=role,
+    )
     return user  # Ensure the coroutine is awaited and the result is returned
 
 
@@ -71,7 +89,12 @@ async def superuser():
 async def admin():
     role = await Role.create(role_name="Admin")
     encrypt_password = pwd_context.hash("password_admin")
-    user = await User.create(username="admin", email="admin@example.com", password=encrypt_password, role=role)
+    user = await User.create(
+        username="admin",
+        email="admin@example.com",
+        password=encrypt_password,
+        role=role,
+    )
     return user
 
 
@@ -82,7 +105,9 @@ async def adm_area():
 
 @pytest_asyncio.fixture
 async def district(adm_area):
-    return await District.create(name="Test District", adm_area=adm_area)  # Пример связи
+    return await District.create(
+        name="Test District", adm_area=adm_area
+    )  # Пример связи
 
 
 @pytest_asyncio.fixture
@@ -92,9 +117,10 @@ async def house(adm_area, district):
         full_address="Test Address",
         simple_address="Test Simple Address",
         adm_area=adm_area,  # Указываем связанный AdmArea
-        district=district   # Указываем связанный District
+        district=district,  # Указываем связанный District
     )
     return house_instance
+
 
 @pytest_asyncio.fixture
 async def multiple_houses(house, adm_area, district):
@@ -103,9 +129,10 @@ async def multiple_houses(house, adm_area, district):
         full_address="Another Address",
         simple_address="Another Simple Address",
         adm_area=adm_area,
-        district=district
+        district=district,
     )
     return [house, house2]
+
 
 @pytest_asyncio.fixture
 async def review(house, user):
@@ -115,8 +142,9 @@ async def review(house, user):
         rating=4,
         review_text="Отличный дом!",
         is_published=False,
-        is_deleted=False
+        is_deleted=False,
     )
+
 
 @pytest_asyncio.fixture
 async def review_superuser(house, superuser):
@@ -126,7 +154,7 @@ async def review_superuser(house, superuser):
         rating=4,
         review_text="Отличный дом!",
         is_published=False,
-        is_deleted=False
+        is_deleted=False,
     )
 
 

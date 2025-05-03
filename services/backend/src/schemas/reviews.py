@@ -9,9 +9,11 @@ class EditReviewSchema(BaseModel):
     new_rating: int
     new_review_text: str
 
+
 class ModerateReviewSchema(BaseModel):
     review_id: UUID
     action: str  # "approve" или "reject"
+
 
 class ReviewOutSchema(BaseModel):
     id: UUID

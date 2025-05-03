@@ -19,11 +19,13 @@ async def download_data(current_user: UserOutSchema = Depends(get_current_user))
     await download.main()
     return JSONResponse(content={"message": "Download completed"})
 
+
 @router.post("/admin/upload")
 async def upload_data(current_user: UserOutSchema = Depends(get_current_user)):
     await is_admin(current_user)
     await upload.main()
     return JSONResponse(content={"message": "Upload completed"})
+
 
 @router.post("/admin/update-houses")
 async def update_houses(current_user: UserOutSchema = Depends(get_current_user)):
@@ -34,8 +36,7 @@ async def update_houses(current_user: UserOutSchema = Depends(get_current_user))
 
 @router.post("/review/moderate", response_model=ReviewOutSchema)
 async def moderate_review_route(
-    data: ModerateReviewSchema,
-    current_user: UserOutSchema = Depends(get_current_user)
+    data: ModerateReviewSchema, current_user: UserOutSchema = Depends(get_current_user)
 ):
     await is_admin(current_user)
     try:

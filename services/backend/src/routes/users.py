@@ -7,16 +7,21 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from tortoise.contrib.fastapi import HTTPNotFoundError
 
-from src.auth.jwthandler import (ACCESS_TOKEN_EXPIRE_MINUTES,
-                                 create_access_token, get_current_user)
+from src.auth.jwthandler import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    create_access_token,
+    get_current_user,
+)
 from src.auth.users import validate_user
 from src.schemas.token import Status
 from src.schemas.users import UserFrontSchema, UserInSchema, UserOutSchema
-from src.services.users import (create_user_with_logic, delete_user_with_logic,
-                                get_user_with_logic)
+from src.services.users import (
+    create_user_with_logic,
+    delete_user_with_logic,
+    get_user_with_logic,
+)
 
 router = APIRouter()
-
 
 
 @router.post("/register", response_model=UserOutSchema)
@@ -61,7 +66,9 @@ async def login(user: OAuth2PasswordRequestForm = Depends()):
 
 
 @router.get(
-    "/users/whoami", response_model=UserOutSchema, dependencies=[Depends(get_current_user)]
+    "/users/whoami",
+    response_model=UserOutSchema,
+    dependencies=[Depends(get_current_user)],
 )
 async def read_users_me(current_user: UserOutSchema = Depends(get_current_user)):
     try:
@@ -73,7 +80,9 @@ async def read_users_me(current_user: UserOutSchema = Depends(get_current_user))
 
 
 @router.get(
-    "/users/getuser", response_model=UserFrontSchema, dependencies=[Depends(get_current_user)]
+    "/users/getuser",
+    response_model=UserFrontSchema,
+    dependencies=[Depends(get_current_user)],
 )
 async def read_users_me(current_user: UserOutSchema = Depends(get_current_user)):
     try:
@@ -82,6 +91,7 @@ async def read_users_me(current_user: UserOutSchema = Depends(get_current_user))
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
+
 
 @router.delete(
     "/user/{user_id}",

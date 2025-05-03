@@ -7,12 +7,14 @@ from tortoise import fields, models
 # Здесь они унаследованы от TextField для хранения строкового представления WKT.
 # В реальном проекте следует реализовать полноценную сериализацию/десериализацию.
 class GeometryField(fields.TextField):
-    """ Поле для хранения геометрического объекта (например, полигон в формате WKT). """
+    """Поле для хранения геометрического объекта (например, полигон в формате WKT)."""
+
     pass
 
 
 class PointField(fields.TextField):
-    """ Поле для хранения точки (например, центральная точка объекта) в формате WKT. """
+    """Поле для хранения точки (например, центральная точка объекта) в формате WKT."""
+
     pass
 
 
@@ -56,11 +58,17 @@ class House(models.Model):
     full_address = fields.TextField()
     simple_address = fields.TextField()
 
-    adm_area = fields.ForeignKeyField("models.AdmArea", related_name="houses", to_field="id")
-    district = fields.ForeignKeyField("models.District", related_name="houses", to_field="id")
+    adm_area = fields.ForeignKeyField(
+        "models.AdmArea", related_name="houses", to_field="id"
+    )
+    district = fields.ForeignKeyField(
+        "models.District", related_name="houses", to_field="id"
+    )
 
     kad_n = fields.TextField(null=True)  # Кадастровый номер объекта недвижимости
-    kad_zu = fields.TextField(null=True)  # Кадастровый номер земельного участка (если имеется)
+    kad_zu = fields.TextField(
+        null=True
+    )  # Кадастровый номер земельного участка (если имеется)
 
     geo_data = GeometryField(null=True)
     geodata_center = PointField(null=True)
@@ -106,7 +114,9 @@ class User(models.Model):
 
 class Review(models.Model):
     id = fields.UUIDField(pk=True, default=uuid.uuid4)
-    house = fields.ForeignKeyField("models.House", related_name="reviews", to_field="id")
+    house = fields.ForeignKeyField(
+        "models.House", related_name="reviews", to_field="id"
+    )
     user = fields.ForeignKeyField("models.User", related_name="reviews", to_field="id")
     rating = fields.IntField()  # от 1 до 5
     review_text = fields.TextField()
@@ -122,12 +132,15 @@ class Review(models.Model):
     def __str__(self):
         return f"Review {self.id} for House {self.house_id} by User {self.user_id}"
 
+
 class Photo(models.Model):
     id = fields.UUIDField(pk=True, default=uuid.uuid4)
-    base64_data = fields.TextField()  # Строковое представление изображения в формате Base64
+    base64_data = (
+        fields.TextField()
+    )  # Строковое представление изображения в формате Base64
     title = fields.CharField(max_length=255)
     metadata = fields.JSONField(null=True)
-    
+
     # Если фото относится к дому, это поле заполняется:
     house = fields.ForeignKeyField("models.House", related_name="photos", null=True)
     # Если фото относится к отзыву, это поле заполняется:
@@ -138,13 +151,16 @@ class Photo(models.Model):
 
     def __str__(self):
         return self.title
-    
+
+
 class UserSettings(models.Model):
     id = fields.UUIDField(pk=True, default=uuid.uuid4)
     # Однозначное соответствие настроек конкретному пользователю
     user = fields.OneToOneField("models.User", related_name="settings", to_field="id")
-    profile_photo = fields.ForeignKeyField("models.Photo", related_name="user_settings", null=True)
-    
+    profile_photo = fields.ForeignKeyField(
+        "models.Photo", related_name="user_settings", null=True
+    )
+
     # Пример дополнительных полей для изменения данных о себе
     bio = fields.TextField(null=True)
     preferences = fields.JSONField(null=True)

@@ -13,12 +13,12 @@ def convert_json_to_new_format(input_json_path, output_json_path):
             raise FileNotFoundError(f"JSON файл не найден: {input_json_path}")
 
         # Чтение данных из JSON-файла с поддержкой разных кодировок
-        encodings_to_try = ['utf-8', 'cp1251', 'latin1']
+        encodings_to_try = ["utf-8", "cp1251", "latin1"]
         json_data = None
 
         for encoding in encodings_to_try:
             try:
-                with input_path.open('r', encoding=encoding) as json_file:
+                with input_path.open("r", encoding=encoding) as json_file:
                     json_data = json.load(json_file)
                 print(f"Файл успешно прочитан с кодировкой {encoding}.")
                 break
@@ -26,26 +26,34 @@ def convert_json_to_new_format(input_json_path, output_json_path):
                 continue
 
         if json_data is None:
-            raise ValueError("Не удалось прочитать файл ни в одной из поддерживаемых кодировок.")
+            raise ValueError(
+                "Не удалось прочитать файл ни в одной из поддерживаемых кодировок."
+            )
 
         # Преобразуем данные в новый формат
         new_data = []
         for index, item in enumerate(json_data, start=1):
             # Проверяем, является ли элемент словарём
             if not isinstance(item, dict):
-                print(f"Предупреждение: Элемент {index} имеет некорректный тип ({type(item).__name__}), пропускается.")
+                print(
+                    f"Предупреждение: Элемент {index} имеет некорректный тип ({type(item).__name__}), пропускается."
+                )
                 continue
 
             # Проверяем наличие и тип geodata_center
             geodata_center = item.get("geodata_center", {})
             if not isinstance(geodata_center, dict):
-                print(f"Предупреждение: Пропущен элемент {index}, так как geodata_center имеет некорректный тип ({type(geodata_center).__name__}).")
+                print(
+                    f"Предупреждение: Пропущен элемент {index}, так как geodata_center имеет некорректный тип ({type(geodata_center).__name__})."
+                )
                 continue
 
             # Извлекаем координаты
             coordinates = geodata_center.get("coordinates", [None, None])
             if None in coordinates:
-                print(f"Предупреждение: Пропущен элемент {index}, так как отсутствуют координаты.")
+                print(
+                    f"Предупреждение: Пропущен элемент {index}, так как отсутствуют координаты."
+                )
                 continue
 
             # Меняем местами координаты (широту и долготу)
@@ -59,13 +67,13 @@ def convert_json_to_new_format(input_json_path, output_json_path):
                 "ADDRESS": item.get("ADDRESS", "N/A"),
                 "geodata_center": {
                     "coordinates": fixed_coordinates  # Используем исправленные координаты
-                }
+                },
             }
 
             new_data.append(new_item)
 
         # Сохраняем новые данные в выходной JSON-файл
-        with output_path.open('w', encoding='utf-8') as output_file:
+        with output_path.open("w", encoding="utf-8") as output_file:
             json.dump(new_data, output_file, ensure_ascii=False, indent=4)
 
         print(f"Новый JSON файл успешно создан: {output_json_path}")
@@ -76,6 +84,7 @@ def convert_json_to_new_format(input_json_path, output_json_path):
         print(f"Ошибка: Файл {input_json_path} содержит некорректные JSON данные.")
     except Exception as e:
         print(f"Произошла ошибка: {e}")
+
 
 # Пример использования
 if __name__ == "__main__":

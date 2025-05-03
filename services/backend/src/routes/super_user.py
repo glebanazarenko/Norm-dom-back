@@ -9,10 +9,13 @@ from src.services.users import is_super_user
 router = APIRouter()
 
 
-@router.post("/review/edit", response_model=ReviewOutSchema, dependencies=[Depends(get_current_user)])
+@router.post(
+    "/review/edit",
+    response_model=ReviewOutSchema,
+    dependencies=[Depends(get_current_user)],
+)
 async def edit_review_route(
-    data: EditReviewSchema,
-    current_user: UserOutSchema = Depends(get_current_user)
+    data: EditReviewSchema, current_user: UserOutSchema = Depends(get_current_user)
 ):
     await is_super_user(current_user)
     try:
