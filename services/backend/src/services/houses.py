@@ -8,13 +8,13 @@ import src.crud.reviews as crud_reviews
 import src.crud.users as crud_user
 from src.crud.houses import get_house, get_house_by_id, get_or_none
 from src.main import logger
-from src.schemas.houses import HouseOutSchema
+from src.schemas.houses import HouseOutSchema, HouseOutOneSchema, HouseOutReviewSchema
 from src.schemas.users import UserOutSchema
 
 
 async def add_review_to_house_with_logic(
     id: UUID, review_text: str, rating: int, current_user: UserOutSchema
-) -> HouseOutSchema:
+) -> HouseOutReviewSchema:
     # Проверяем, существует ли дом
     house = await get_or_none(id=id)
     if not house:
@@ -37,7 +37,7 @@ async def add_review_to_house_with_logic(
 
     # Обновляем дом с новым списком отзывов
     await house.fetch_related("reviews")  # Получаем связанные отзывы
-    return await HouseOutSchema.from_tortoise_orm(house)  # Возвращаем обновленный дом
+    return await HouseOutReviewSchema.from_tortoise_orm(house)  # Возвращаем обновленный дом
 
 
 async def get_searched_houses(
@@ -50,14 +50,16 @@ async def get_searched_houses(
 
     if not houses:
         raise HTTPException(status_code=404, detail="Нет такого дома")
+    
+    return houses
 
-    logger.info(f"Дома {houses}")
+    # logger.info(f"Дома {houses}")
 
-    # Используем HouseOutSchema для сериализации данных
-    return [await HouseOutSchema.from_tortoise_orm(house) for house in houses]
+    # # Используем HouseOutSchema для сериализации данных
+    # return [await HouseOutSchema.from_tortoise_orm(house) for house in houses]
 
 
-async def get_house_by_id_with_logic(house_id: UUID) -> HouseOutSchema:
+async def get_house_by_id_with_logic(house_id: UUID) -> HouseOutOneSchema:
     # Получаем дом из репозитория
     house = await get_house_by_id(house_id)
 
@@ -68,7 +70,9 @@ async def get_house_by_id_with_logic(house_id: UUID) -> HouseOutSchema:
     # Например: логируем запрос
     print(f"[INFO] Получен дом с ID: {house.id}")
 
+    return house
+
     # Можно добавить проверки, права доступа, кэширование и т.д.
 
     # Сериализуем модель в Pydantic
-    return await HouseOutSchema.from_tortoise_orm(house)
+    # return await HouseOutSchema.from_tortoise_orm(house)

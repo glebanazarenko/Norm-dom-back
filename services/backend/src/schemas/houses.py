@@ -2,6 +2,9 @@ from pydantic import BaseModel
 from tortoise.contrib.pydantic import pydantic_model_creator
 
 from src.database.models import House
+from uuid import UUID
+from typing import List, Optional
+
 
 # Схема для входных данных (если потребуется создание дома)
 HouseInSchema = pydantic_model_creator(
@@ -25,11 +28,34 @@ HouseOutFrontSchema = pydantic_model_creator(
 )
 
 # Схема для полного представления дома (для админов)
-HouseOutSchema = pydantic_model_creator(
+HouseOut = pydantic_model_creator(
     House,
     name="HouseOut",
-    exclude=("geo_data", "geodata_center"),
+    exclude=("geo_data", "geodata_center", "adm_area", "district", "adm_area_id", "district_id", "reviews", "photos"),
 )
+
+class HouseOutReviewSchema(HouseOut):
+    pass
+
+
+class HouseOutSchema(HouseOut):
+    rating: str
+    rating_count: str
+    adm_area: str
+    district: str
+    reviews: Optional[List[UUID]] = None
+
+class HouseOutOneSchema(HouseOut):
+    rating: str
+    rating_count: str
+    adm_area: str
+    district: str
+    geo_data: str
+    geodata_center: str
+    latitude: str
+    longitude: str
+    reviews: Optional[List] = None
+    photos: Optional[List[UUID]] = None
 
 # Схема для хранения данных в базе данных
 HouseDatabaseSchema = pydantic_model_creator(

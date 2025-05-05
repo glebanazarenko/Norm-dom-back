@@ -1,6 +1,7 @@
 from tortoise.contrib.pydantic import pydantic_model_creator
 
 from src.database.models import User
+from uuid import UUID
 
 UserInSchema = pydantic_model_creator(
     User,
@@ -24,6 +25,7 @@ UserOutFrontSchema = pydantic_model_creator(
 
 class UserFrontSchema(UserOutFrontSchema):
     role_name: str
+    id: UUID
 
     class Config:
         orm_mode = True

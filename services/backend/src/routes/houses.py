@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.auth.jwthandler import get_current_user
-from src.schemas.houses import HouseOutSchema, ReviewCreateSchema
+from src.schemas.houses import HouseOutSchema, ReviewCreateSchema, HouseOutOneSchema, HouseOutReviewSchema
 from src.schemas.users import UserOutSchema
 from src.services.houses import (
     add_review_to_house_with_logic,
@@ -22,11 +22,9 @@ async def search_houses(query: str):
         return houses
     except HTTPException as e:
         raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 
-@router.get("/house/{id}", response_model=HouseOutSchema)
+@router.get("/house/{id}", response_model=HouseOutOneSchema)
 async def get_house_by_id(id: UUID):
     try:
         house = await get_house_by_id_with_logic(id)
@@ -39,7 +37,7 @@ async def get_house_by_id(id: UUID):
 
 @router.post(
     "/house/{id}/reviews",
-    response_model=HouseOutSchema,
+    response_model=HouseOutReviewSchema,
     dependencies=[Depends(get_current_user)],
 )
 async def add_review_to_house(
@@ -54,5 +52,3 @@ async def add_review_to_house(
         return house
     except HTTPException as e:
         raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
