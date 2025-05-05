@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { MapPin, Calendar, Building, Star, Loader2, ChevronLeft } from 'lucide-react';
 import { getHouseById } from '../api/house';
 import ReviewCard from '../components/houses/ReviewCard';
 import AddReviewForm from '../components/houses/AddReviewForm';
 import { useAuth } from '../contexts/AuthContext';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const HouseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,6 +14,8 @@ const HouseDetailPage: React.FC = () => {
   const [house, setHouse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const mapRef = useRef<HTMLDivElement | null>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
 
   const fetchHouseDetails = async () => {
     if (!id) return;
@@ -33,6 +37,37 @@ const HouseDetailPage: React.FC = () => {
     fetchHouseDetails();
   }, [id]);
 
+  useEffect(() => {
+    if (!house?.latitude || !house?.longitude || !mapRef.current) return;
+
+    // Очистка старой карты
+    if (mapInstanceRef.current) {
+      mapInstanceRef.current.remove();
+    }
+
+    // Инициализация новой карты
+    mapInstanceRef.current = L.map(mapRef.current).setView(
+      [house.latitude, house.longitude],
+      14
+    );
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(mapInstanceRef.current);
+
+    // Добавляем маркер
+    L.marker([house.latitude, house.longitude])
+      .addTo(mapInstanceRef.current)
+      .openPopup();
+
+    // Очистка при размонтировании
+    return () => {
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+      }
+    };
+  }, [house?.latitude, house?.longitude]);
+
   const handleReviewAdded = () => {
     // Refresh house data to show the new review
     fetchHouseDetails();
@@ -45,7 +80,7 @@ const HouseDetailPage: React.FC = () => {
 
   // Helper function to check if review belongs to current user
   const isUserReview = (reviewUserId: string) => {
-   return user && user.id === reviewUserId;
+    return user && user.id === reviewUserId;
   };
 
   // Filter reviews for display (only published ones for regular view)
@@ -56,6 +91,25 @@ const HouseDetailPage: React.FC = () => {
     return house.reviews.filter((review: any) => 
       review.is_published && !review.is_deleted
     );
+  };
+
+  const getReviewWord = (count: number): string => {
+    const lastDigit = count % 10;
+    const lastTwoDigits = count % 100;
+    
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+      return 'отзывов';
+    }
+    
+    if (lastDigit === 1) {
+      return 'отзыв';
+    }
+    
+    if (lastDigit >= 2 && lastDigit <= 4) {
+      return 'отзыва';
+    }
+    
+    return 'отзывов';
   };
 
   if (isLoading) {
@@ -113,8 +167,10 @@ const HouseDetailPage: React.FC = () => {
             {house.rating !== undefined && (
               <div className="flex items-center space-x-1 bg-yellow-100 px-3 py-1 rounded-lg">
                 <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-                <span className="font-semibold">{house.rating}</span>
-                <span className="text-sm text-gray-600">
+                <span className="font-semibold whitespace-nowrap">
+                  {house.rating}
+                </span>
+                <span className="text-sm text-gray-600 whitespace-nowrap">
                   ({house.rating_count || 0} {getReviewWord(house.rating_count || 0)})
                 </span>
               </div>
@@ -151,13 +207,21 @@ const HouseDetailPage: React.FC = () => {
               </ul>
             </div>
 
+            {/* Стили для карты */}
+            <style jsx>{`
+              /* Скрыть атрибуцию Leaflet */
+              .leaflet-attribution-flag {
+                display: none !important;
+              }
+            `}</style>
+
             {house.latitude && house.longitude && (
-              <div className="h-48 bg-gray-100 rounded-lg">
-                {/* Map preview would go here */}
-                <div className="h-full flex items-center justify-center text-gray-500">
-                  <MapPin className="h-6 w-6 mr-2" />
-                  <span>Карта (широта: {house.latitude}, долгота: {house.longitude})</span>
-                </div>
+              <div className="h-64 rounded-lg overflow-hidden shadow-md">
+                <div 
+                  id="house-detail-map" 
+                  className="w-full h-full"
+                  ref={mapRef}
+                ></div>
               </div>
             )}
           </div>
@@ -204,25 +268,5 @@ const HouseDetailPage: React.FC = () => {
     </div>
   );
 };
-
-// Helper function to get the correct word form for reviews count
-function getReviewWord(count: number): string {
-  const lastDigit = count % 10;
-  const lastTwoDigits = count % 100;
-  
-  if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
-    return 'отзывов';
-  }
-  
-  if (lastDigit === 1) {
-    return 'отзыв';
-  }
-  
-  if (lastDigit >= 2 && lastDigit <= 4) {
-    return 'отзыва';
-  }
-  
-  return 'отзывов';
-}
 
 export default HouseDetailPage;

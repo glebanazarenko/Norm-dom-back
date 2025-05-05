@@ -113,10 +113,10 @@ const SearchPage: React.FC = () => {
             <div>
               <div className="mb-4 flex justify-between items-center">
                 <p className="text-gray-600">Найдено домов: {searchResults.length}</p>
-                <Link to="/map" className="text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                {/* <Link to="/map" className="text-blue-600 hover:text-blue-800 flex items-center gap-1">
                   <MapPin size={16} />
                   <span>Показать на карте</span>
-                </Link>
+                </Link> */}
               </div>
 
               <div className="grid gap-6 mb-8">
