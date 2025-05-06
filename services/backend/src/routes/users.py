@@ -1,7 +1,7 @@
 import uuid
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Path
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -15,10 +15,12 @@ from src.auth.jwthandler import (
 from src.auth.users import validate_user
 from src.schemas.token import Status
 from src.schemas.users import UserFrontSchema, UserInSchema, UserOutSchema
+from src.schemas.reviews import ReviewListResponse
 from src.services.users import (
     create_user_with_logic,
     delete_user_with_logic,
     get_user_with_logic,
+    get_user_reviews,
 )
 
 router = APIRouter()
@@ -104,6 +106,26 @@ async def delete_user(
 ) -> Status:
     try:
         return await delete_user_with_logic(user_id, current_user.id)
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
+
+
+@router.get(
+    "/users/{user_id}/reviews",
+    response_model=ReviewListResponse,
+    summary="Получить список отзывов пользователя",
+    description="Возвращает все отзывы, оставленные пользователем с указанным ID.",
+    dependencies=[Depends(get_current_user)],
+)
+async def read_user_reviews(
+    user_id: uuid.UUID = Path(..., description="ID пользователя"),
+    current_user: UserOutSchema = Depends(get_current_user)  # опционально
+):
+    try:
+        reviews = await get_user_reviews(user_id)
+        return {"reviews": reviews}
     except HTTPException as e:
         raise e
     except Exception as e:

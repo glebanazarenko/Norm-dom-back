@@ -28,7 +28,8 @@ const ProfilePage: React.FC = () => {
       try {
         // This is a mock endpoint - you'll need to create this endpoint on your backend
         const response = await axios.get(`/users/${user.id}/reviews`);
-        setUserReviews(response.data);
+        const activeReviews = response.data.reviews.filter((r: any) => !r.is_deleted);
+        setUserReviews(activeReviews);
       } catch (error) {
         console.error('Error fetching user reviews:', error);
         setError('Не удалось загрузить ваши отзывы. Пожалуйста, попробуйте позже.');
@@ -45,8 +46,7 @@ const ProfilePage: React.FC = () => {
   }, [user]);
 
   const handleEditSuccess = () => {
-    // Refresh reviews after edit
-    // For a real implementation, you would call fetchUserReviews() here
+    // Refresh reviews after edit (optional: fetchUserReviews())
   };
 
   // Loading state
@@ -125,7 +125,7 @@ const ProfilePage: React.FC = () => {
                   <ReviewCard
                     key={review.id}
                     review={review}
-                    canEdit={user?.role_name === 'Super User'}
+                    canEdit={user?.role_name === 'Super User' && user?.id === review.user_id || user?.role_name === 'Admin'}
                     onEditSuccess={handleEditSuccess}
                   />
                 ))}

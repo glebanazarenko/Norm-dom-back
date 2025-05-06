@@ -23,6 +23,8 @@ async def get_user(username) -> UserFrontSchema:
 async def get(id: UUID):
     return await User.get(id=id)
 
+async def get_or_none(id: UUID):
+    return await User.get_or_none(id=id)
 
 async def get_first_user(username: str):
     return await User.filter(username=username).first()

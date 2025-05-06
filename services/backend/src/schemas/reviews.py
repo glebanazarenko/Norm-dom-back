@@ -1,3 +1,7 @@
+from tortoise.contrib.pydantic import pydantic_model_creator
+
+from src.database.models import Review
+
 from datetime import datetime
 from uuid import UUID
 
@@ -28,3 +32,13 @@ class ReviewOutSchema(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+ReviewSchema = pydantic_model_creator(
+    Review,
+    name="ReviewSchema",
+    exclude=("user",),
+)
+
+class ReviewListResponse(BaseModel):
+    reviews: list[ReviewSchema]

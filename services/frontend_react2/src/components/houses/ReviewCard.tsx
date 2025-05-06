@@ -6,9 +6,11 @@ import EditReviewForm from './EditReviewForm';
 interface ReviewCardProps {
   review: {
     id: string;
-    house_id: string;
+    house: {
+      id: string;
+      simple_address: string;
+    };
     user_id: string;
-    username?: string;
     rating: number;
     review_text: string;
     is_published: boolean;
@@ -22,7 +24,7 @@ interface ReviewCardProps {
 const ReviewCard: React.FC<ReviewCardProps> = ({ review, canEdit, onEditSuccess }) => {
   const { user } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
-  
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('ru-RU', {
@@ -31,7 +33,7 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, canEdit, onEditSuccess 
       year: 'numeric'
     });
   };
-  
+
   const renderStars = (rating: number) => {
     return Array(5).fill(0).map((_, i) => (
       <Star 
@@ -40,25 +42,24 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, canEdit, onEditSuccess 
       />
     ));
   };
-  
+
   const handleEditClick = () => {
     setIsEditing(true);
   };
-  
+
   const handleEditCancel = () => {
     setIsEditing(false);
   };
-  
+
   const handleEditSuccess = () => {
     setIsEditing(false);
     if (onEditSuccess) {
       onEditSuccess();
     }
   };
-  
-  // Determine if the user can edit this review (super user or own review)
-  const userCanEdit = canEdit && user?.id === review.user_id;
-  
+
+  const userCanEdit = canEdit;
+
   if (isEditing) {
     return (
       <EditReviewForm
@@ -70,16 +71,21 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, canEdit, onEditSuccess 
       />
     );
   }
-  
+
   return (
     <div className={`p-4 border rounded-lg mb-4 ${!review.is_published ? 'bg-gray-50 border-gray-300' : 'bg-white border-gray-200'}`}>
+      {review.house && (
+        <div className="text-sm text-gray-500 mb-2">
+          {review.house.simple_address}
+        </div>
+      )}
       <div className="flex justify-between items-start">
         <div>
           <div className="flex items-center space-x-2">
             <div className="flex">{renderStars(review.rating)}</div>
-            <span className="font-medium text-gray-700">{review.username || 'Пользователь'}</span>
+            <span className="font-medium text-gray-700">{user?.full_name || 'Пользователь'}</span>
           </div>
-          <div className="text-sm text-gray-500">
+          <div className="text-xs text-gray-500">
             {formatDate(review.created_at)}
             {review.modified_at !== review.created_at && 
               ` (ред. ${formatDate(review.modified_at)})`}
@@ -87,15 +93,13 @@ const ReviewCard: React.FC<ReviewCardProps> = ({ review, canEdit, onEditSuccess 
         </div>
         
         {userCanEdit && (
-          <div className="flex space-x-2">
-            <button 
-              onClick={handleEditClick}
-              className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
-              title="Редактировать отзыв"
-            >
-              <Edit size={18} />
-            </button>
-          </div>
+          <button 
+            onClick={handleEditClick}
+            className="p-1 text-blue-600 hover:text-blue-800 transition-colors"
+            title="Редактировать отзыв"
+          >
+            <Edit size={18} />
+          </button>
         )}
       </div>
       

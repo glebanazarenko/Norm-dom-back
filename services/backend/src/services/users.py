@@ -11,9 +11,12 @@ from src.crud.users import (
     get,
     get_first_user,
     get_user,
+    get_or_none,
 )
+from src.crud.reviews import get_reviews_by_user
 from src.schemas.token import Status
 from src.schemas.users import UserFrontSchema, UserInSchema, UserOutSchema
+from src.schemas.reviews import ReviewSchema
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -73,3 +76,12 @@ async def delete_user_with_logic(user_id: UUID, current_user_id: UUID) -> Status
         return Status(message=f"Deleted user {user_id}")  # UPDATED
 
     raise HTTPException(status_code=403, detail=f"Not authorized to delete")
+
+async def get_user_reviews(user_id: UUID) -> list[ReviewSchema]:
+    user = await get_or_none(id=user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="Пользователь не найден")
+
+    reviews = await get_reviews_by_user(user=user)
+
+    return [await ReviewSchema.from_tortoise_orm(review) for review in reviews]
