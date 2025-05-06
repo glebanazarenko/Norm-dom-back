@@ -1,5 +1,6 @@
 import asyncio
 import json
+from pathlib import Path
 from decimal import Decimal
 
 from tortoise import Tortoise, run_async
@@ -78,13 +79,37 @@ async def async_iter(generator):
         await asyncio.sleep(0)  # Позволяет переключаться между задачами
 
 
+def get_latest_json_file() -> str | None:
+    """
+    Finds the most recently modified JSON file in the 'src/json/' directory.
+    Returns the full path of the latest file or None if no files exist.
+    """
+    # Define the target directory (adjust based on script location)
+    directory = Path(__file__).parent.parent / "json"
+    
+    if not directory.exists():
+        logger.warning(f"Directory {directory} does not exist.")
+        return None
+
+    # Get all JSON files in the directory
+    files = list(directory.glob("*.json"))
+    if not files:
+        logger.warning(f"No JSON files found in {directory}.")
+        return None
+
+    # Sort files by modification time (newest first)
+    files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+    return str(files[0])
+
+
 async def main():
     """
     Основная функция для инициализации базы данных и загрузки данных.
     """
     logger.info(f"Начинаю загружать данные в бд")
     async with db_connection():
-        file_path = "src/json/data-60562-2025-02-23.json"
+        file_path = get_latest_json_file()
+        logger.info(file_path)
         await load_raw_addresses(file_path)
 
 

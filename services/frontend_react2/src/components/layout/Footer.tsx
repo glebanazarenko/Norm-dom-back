@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Mail, Phone } from 'lucide-react';
+import { Home, Mail, Database } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -39,8 +39,15 @@ const Footer: React.FC = () => {
                 <span>info@normdom.ru</span>
               </div>
               <div className="flex items-center space-x-2">
-                <Phone className="h-5 w-5 text-blue-400" />
-                <span>+7 (999) 123-45-67</span>
+                <Database className="h-5 w-5 text-blue-400" />
+                <a 
+                  href="https://data.mos.ru/opendata/7705031674-adresniy-reestr-zdaniy-i-soorujeniy-v-gorode-moskve" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-blue-400 hover:underline"
+                >
+                  Открытые данные Москвы
+                </a>
               </div>
             </div>
           </div>

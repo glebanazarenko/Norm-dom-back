@@ -1,7 +1,10 @@
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, File, UploadFile
 from fastapi.responses import JSONResponse
 from tortoise.queryset import QuerySet
 from tortoise.exceptions import DoesNotExist
+
+import os
+import shutil
 
 import src.utils.download_data as download
 import src.utils.update_houses as update
@@ -18,10 +21,27 @@ router = APIRouter()
 
 
 @router.post("/admin/download")
-async def download_data(current_user: UserOutSchema = Depends(get_current_user)):
+async def download_data(
+    file: UploadFile = File(...),
+    current_user: dict = Depends(get_current_user),
+):
     await is_admin(current_user)
-    await download.main()
-    return JSONResponse(content={"message": "Download completed"})
+
+    # Define target directory
+    target_dir = "src/json/"
+    os.makedirs(target_dir, exist_ok=True)
+
+    file_path = os.path.join(target_dir, file.filename)
+    if os.path.exists(file_path):
+        raise HTTPException(status_code=500, detail='Уже загружен этот файл в систему')
+
+    try:
+        # Save the file
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        return {"message": "Файл успешно загружен", "file_path": file_path}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Ошибка при сохранении файла: {str(e)}")
 
 
 @router.post("/admin/upload")

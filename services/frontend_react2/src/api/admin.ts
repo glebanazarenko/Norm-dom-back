@@ -1,14 +1,13 @@
 import axios from 'axios';
 
 // Download data
-export const downloadData = async () => {
-  try {
-    const response = await axios.post('/admin/download');
-    return response.data;
-  } catch (error) {
-    console.error('Error downloading data:', error);
-    throw error;
-  }
+export const downloadData = async (formData: FormData) => {
+  const response = await axios.post('/admin/download', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
 };
 
 // Upload data
