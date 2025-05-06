@@ -42,3 +42,14 @@ ReviewSchema = pydantic_model_creator(
 
 class ReviewListResponse(BaseModel):
     reviews: list[ReviewSchema]
+
+class PendingReviewSchema(BaseModel):
+    id: str
+    house_id: str
+    house_address: str
+    user_id: str
+    username: str
+    rating: int
+    review_text: str
+    created_at: datetime
+    modified_at: datetime

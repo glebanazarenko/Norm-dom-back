@@ -46,3 +46,8 @@ export const moderateReview = async (reviewId: string, action: 'approve' | 'reje
     throw error;
   }
 };
+
+export const getAdminStats = async () => {
+  const response = await axios.get('/admin/stats');
+  return response.data;
+};

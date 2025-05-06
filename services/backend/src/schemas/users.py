@@ -1,6 +1,8 @@
+from pydantic import BaseModel
 from tortoise.contrib.pydantic import pydantic_model_creator
 
 from src.database.models import User
+from datetime import datetime
 from uuid import UUID
 
 UserInSchema = pydantic_model_creator(
@@ -35,3 +37,14 @@ class UserFrontSchema(UserOutFrontSchema):
         # Получаем связанные данные, включая role_name
         obj.role_name = obj.role.role_name  # Добавляем поле role_name
         return obj
+
+
+class UserOutAdminSchema(BaseModel):
+    id: str
+    username: str
+    full_name: str
+    email: str
+    role_name: str
+    created_at: datetime
+    is_blocked: bool
+    reviews_count: int = 0

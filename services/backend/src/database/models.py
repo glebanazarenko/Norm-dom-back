@@ -101,6 +101,7 @@ class User(models.Model):
     email = fields.CharField(max_length=255, unique=True)
     password = fields.CharField(max_length=128, null=True)
     role = fields.ForeignKeyField("models.Role", related_name="users", to_field="id")
+    is_blocked = fields.BooleanField(default=False)
 
     created_at = fields.DatetimeField(auto_now_add=True)
     modified_at = fields.DatetimeField(auto_now=True)

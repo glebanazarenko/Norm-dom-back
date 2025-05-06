@@ -31,8 +31,16 @@ const LoginPage: React.FC = () => {
     try {
       await login(username, password);
       navigate('/');
-    } catch (err) {
-      setError('Неверное имя пользователя или пароль');
+    } catch (err: any) {
+      // Handle specific "blocked" error
+      if (
+        err?.response?.data?.detail === 'User is blocked' ||
+        err?.message?.includes('blocked')
+      ) {
+        setError('Ваш аккаунт заблокирован. Обратитесь в поддержку.');
+      } else {
+        setError('Неверное имя пользователя или пароль');
+      }
     } finally {
       setIsLoading(false);
     }

@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Download, Upload, RefreshCw, Loader2 } from 'lucide-react';
-import { downloadData, uploadData, updateHouses } from '../../api/admin';
+import { downloadData, uploadData, updateHouses, getAdminStats } from '../../api/admin';
 import { toast } from 'react-toastify';
 
 const AdminDashboard: React.FC = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [stats, setStats] = useState({
+    last_house_update: null as string | null,
+    total_houses: 0,
+    total_users: 0,
+    total_reviews: 0,
+    pending_reviews: 0,
+    average_rating: 0,
+  });
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleDownloadData = async () => {
     setIsDownloading(true);
@@ -45,6 +55,38 @@ const AdminDashboard: React.FC = () => {
     } finally {
       setIsUpdating(false);
     }
+  };
+
+  useEffect(() => {
+    const fetchAdminStats = async () => {
+      try {
+        const data = await getAdminStats();
+        setStats(data);
+      } catch (err) {
+        console.error('Error fetching admin stats:', err);
+        setError('Не удалось загрузить данные');
+        toast.error('Ошибка загрузки статистики');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAdminStats();
+  }, []);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('ru-RU', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const formatRating = (rating: number) => {
+    return `${rating.toFixed(1)} / 5`;
   };
 
   return (
@@ -148,37 +190,44 @@ const AdminDashboard: React.FC = () => {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <h2 className="text-lg font-semibold mb-4">Системная информация</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div className="p-4 bg-gray-50 rounded-md">
-            <p className="text-sm text-gray-500">Последнее обновление данных</p>
-            <p className="font-medium">15.05.2025 12:34</p>
+        {isLoading ? (
+          <div className="flex justify-center py-4">
+            <Loader2 className="animate-spin text-gray-500 h-6 w-6" />
           </div>
-          
-          <div className="p-4 bg-gray-50 rounded-md">
-            <p className="text-sm text-gray-500">Количество домов в системе</p>
-            <p className="font-medium">15,487</p>
+        ) : error ? (
+          <p className="text-red-500">{error}</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="p-4 bg-gray-50 rounded-md">
+              <p className="text-sm text-gray-500">Последнее обновление данных</p>
+              <p className="font-medium">
+                {stats.last_house_update
+                  ? formatDate(stats.last_house_update)
+                  : 'Нет данных'}
+              </p>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-md">
+              <p className="text-sm text-gray-500">Количество домов в системе</p>
+              <p className="font-medium">{stats.total_houses.toLocaleString('ru-RU')}</p>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-md">
+              <p className="text-sm text-gray-500">Количество пользователей</p>
+              <p className="font-medium">{stats.total_users.toLocaleString('ru-RU')}</p>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-md">
+              <p className="text-sm text-gray-500">Всего отзывов</p>
+              <p className="font-medium">{stats.total_reviews.toLocaleString('ru-RU')}</p>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-md">
+              <p className="text-sm text-gray-500">Отзывов на модерации</p>
+              <p className="font-medium">{stats.pending_reviews.toLocaleString('ru-RU')}</p>
+            </div>
+            <div className="p-4 bg-gray-50 rounded-md">
+              <p className="text-sm text-gray-500">Средний рейтинг домов</p>
+              <p className="font-medium">{formatRating(stats.average_rating)}</p>
+            </div>
           </div>
-          
-          <div className="p-4 bg-gray-50 rounded-md">
-            <p className="text-sm text-gray-500">Количество пользователей</p>
-            <p className="font-medium">823</p>
-          </div>
-          
-          <div className="p-4 bg-gray-50 rounded-md">
-            <p className="text-sm text-gray-500">Всего отзывов</p>
-            <p className="font-medium">3,254</p>
-          </div>
-          
-          <div className="p-4 bg-gray-50 rounded-md">
-            <p className="text-sm text-gray-500">Отзывов на модерации</p>
-            <p className="font-medium">12</p>
-          </div>
-          
-          <div className="p-4 bg-gray-50 rounded-md">
-            <p className="text-sm text-gray-500">Средний рейтинг домов</p>
-            <p className="font-medium">3.7 / 5</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
