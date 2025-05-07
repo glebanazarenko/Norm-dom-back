@@ -19,7 +19,7 @@ const HouseDetailPage: React.FC = () => {
 
   const fetchHouseDetails = async () => {
     if (!id) return;
-    
+
     setIsLoading(true);
     try {
       const houseData = await getHouseById(id);
@@ -33,6 +33,7 @@ const HouseDetailPage: React.FC = () => {
     }
   };
 
+  // Fetch house data initially and after adding a review
   useEffect(() => {
     fetchHouseDetails();
   }, [id]);
@@ -71,11 +72,19 @@ const HouseDetailPage: React.FC = () => {
   const handleReviewAdded = () => {
     // Refresh house data to show the new review
     fetchHouseDetails();
+    // Перезагрузка через 3 секунды
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
   };
 
   // Helper function to check if user is super user
   const isSuperUser = () => {
     return user && user.role_name === 'Super User';
+  };
+
+  const isAdmin = () => {
+    return user && user.role_name === 'Admin';
   };
 
   // Helper function to check if review belongs to current user
@@ -86,9 +95,9 @@ const HouseDetailPage: React.FC = () => {
   // Filter reviews for display (only published ones for regular view)
   const getDisplayedReviews = () => {
     if (!house || !house.reviews) return [];
-    
+
     // Only show published reviews to everyone
-    return house.reviews.filter((review: any) => 
+    return house.reviews.filter((review: any) =>
       review.is_published && !review.is_deleted
     );
   };
@@ -96,19 +105,19 @@ const HouseDetailPage: React.FC = () => {
   const getReviewWord = (count: number): string => {
     const lastDigit = count % 10;
     const lastTwoDigits = count % 100;
-    
+
     if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
       return 'отзывов';
     }
-    
+
     if (lastDigit === 1) {
       return 'отзыв';
     }
-    
+
     if (lastDigit >= 2 && lastDigit <= 4) {
       return 'отзыва';
     }
-    
+
     return 'отзывов';
   };
 
@@ -163,7 +172,7 @@ const HouseDetailPage: React.FC = () => {
               <MapPin className="h-6 w-6 text-blue-500 mt-1" />
               <h1 className="text-2xl font-bold text-gray-900">{house.full_address}</h1>
             </div>
-            
+
             {house.rating !== undefined && (
               <div className="flex items-center space-x-1 bg-yellow-100 px-3 py-1 rounded-lg">
                 <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
@@ -217,8 +226,8 @@ const HouseDetailPage: React.FC = () => {
 
             {house.latitude && house.longitude && (
               <div className="h-64 rounded-lg overflow-hidden shadow-md">
-                <div 
-                  id="house-detail-map" 
+                <div
+                  id="house-detail-map"
                   className="w-full h-full"
                   ref={mapRef}
                 ></div>
@@ -241,14 +250,14 @@ const HouseDetailPage: React.FC = () => {
             Отзывы о доме
             {displayedReviews.length > 0 && <span className="text-gray-500 ml-2">({displayedReviews.length})</span>}
           </h2>
-          
+
           {displayedReviews.length > 0 ? (
             <div>
               {displayedReviews.map((review: any) => (
-                <ReviewCard 
-                  key={review.id} 
-                  review={review} 
-                  canEdit={isSuperUser() && isUserReview(review.user_id)}
+                <ReviewCard
+                  key={review.id}
+                  review={review}
+                  canEdit={isSuperUser() && isUserReview(review.user_id) || isAdmin()}
                   onEditSuccess={fetchHouseDetails}
                 />
               ))}
@@ -260,7 +269,7 @@ const HouseDetailPage: React.FC = () => {
             </div>
           )}
         </div>
-        
+
         <div>
           <AddReviewForm houseId={house.id} onSuccess={handleReviewAdded} />
         </div>
