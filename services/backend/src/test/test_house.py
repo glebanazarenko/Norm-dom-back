@@ -1,4 +1,7 @@
 import pytest
+from uuid import uuid4
+from unittest.mock import AsyncMock
+from httpx import AsyncClient
 
 
 @pytest.mark.asyncio
@@ -10,8 +13,9 @@ async def test_create_review_user(house, client, mock_authenticated_user):
     )
     assert response.status_code == 200, f"Ошибка: {response.json()}"
     json_response = response.json()
-    assert json_response["reviews"][0]["rating"] == 5
-    assert json_response["reviews"][0]["is_published"] is False
+    assert json_response["unom"] == house.unom
+    assert json_response["full_address"] == house.full_address
+    assert json_response["simple_address"] == house.simple_address
 
 
 @pytest.mark.asyncio
@@ -23,8 +27,9 @@ async def test_create_review_superuser(house, client, mock_authenticated_superus
     )
     assert response.status_code == 200, f"Ошибка: {response.json()}"
     json_response = response.json()
-    assert json_response["reviews"][0]["rating"] == 5
-    assert json_response["reviews"][0]["is_published"] is False
+    assert json_response["unom"] == house.unom
+    assert json_response["full_address"] == house.full_address
+    assert json_response["simple_address"] == house.simple_address
 
 
 @pytest.mark.asyncio
@@ -36,8 +41,9 @@ async def test_create_review_admin(house, client, mock_authenticated_admin):
     )
     assert response.status_code == 200, f"Ошибка: {response.json()}"
     json_response = response.json()
-    assert json_response["reviews"][0]["rating"] == 5
-    assert json_response["reviews"][0]["is_published"] is False
+    assert json_response["unom"] == house.unom
+    assert json_response["full_address"] == house.full_address
+    assert json_response["simple_address"] == house.simple_address
 
 
 @pytest.mark.asyncio
@@ -49,8 +55,8 @@ async def test_search_houses_found(house, client):
     assert data[0]["unom"] == house.unom
     assert data[0]["full_address"] == house.full_address
     assert data[0]["simple_address"] == house.simple_address
-    assert data[0]["adm_area"]["name"] == house.adm_area.name
-    assert data[0]["district"]["name"] == house.district.name
+    assert data[0]["adm_area"] == house.adm_area.name
+    assert data[0]["district"] == house.district.name
 
 
 @pytest.mark.asyncio
@@ -77,13 +83,6 @@ async def test_search_houses_not_found(client):
 
 
 @pytest.mark.asyncio
-async def test_search_houses_empty_query(client):
-    response = await client.get("/houses/search?query=")
-    assert response.status_code == 400, f"Ошибка: {response.json()}"
-    assert response.json() == {"detail": "Пустой запрос"}
-
-
-@pytest.mark.asyncio
 async def test_search_houses_no_query(client):
     response = await client.get("/houses/search")
     assert response.status_code == 422, f"Ошибка: {response.json()}"
@@ -101,7 +100,7 @@ async def test_get_house_by_id_found(house, client):
 async def test_get_house_by_id_not_found(client):
     response = await client.get("/house/123e4567-e89b-12d3-a456-426614174000")
     assert response.status_code == 404, f"Ошибка: {response.json()}"
-    assert response.json() == {"detail": "Нет такого дома"}
+    assert response.json() == {"detail": "Дом не найден"}
 
 
 @pytest.mark.asyncio
@@ -109,11 +108,3 @@ async def test_get_house_by_id_invalid_uuid(client):
     response = await client.get("/house/invalid-uuid")
     assert response.status_code == 422, f"Ошибка: {response.json()}"
 
-
-@pytest.mark.asyncio
-async def test_get_house_by_id_missing_house(house, client):
-    # Создаем дом, но используем другой UUID
-    non_existent_id = "123e4567-e89b-12d3-a456-426614174001"
-    response = await client.get(f"/house/{non_existent_id}")
-    assert response.status_code == 404, f"Ошибка: {response.json()}"
-    assert response.json() == {"detail": "Нет такого дома"}

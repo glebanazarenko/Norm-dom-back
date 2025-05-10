@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from src.auth.jwthandler import get_current_user
 from src.schemas.houses import HouseOutSchema, ReviewCreateSchema, HouseOutOneSchema, HouseOutReviewSchema
 from src.schemas.users import UserOutSchema
+from src.database.models import AdmArea, District
 from src.services.houses import (
     add_review_to_house_with_logic,
     get_house_by_id_with_logic,
@@ -31,8 +32,6 @@ async def get_house_by_id(id: UUID):
         return house
     except HTTPException as e:
         raise e
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
 
 
 @router.post(
@@ -52,3 +51,16 @@ async def add_review_to_house(
         return house
     except HTTPException as e:
         raise e
+    
+
+@router.get("/houses/unique-adm-areas")
+async def get_unique_adm_areas():
+    # Query to get unique adm_areas
+    adm_areas = await AdmArea.all()
+    return {"adm_areas": adm_areas}
+
+@router.get("/houses/unique-districts")
+async def get_unique_districts():
+    # Query to get unique districts
+    districts = await District.all()
+    return {"districts": districts}

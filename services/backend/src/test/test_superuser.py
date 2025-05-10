@@ -52,7 +52,7 @@ async def test_edit_review_unauthorized(review, client, mock_authenticated_user)
 
     response = await client.post("/review/edit", json=data)
     assert response.status_code == 403, f"Ошибка: {response.json()}"
-    assert response.json() == {"detail": "Access denied: Super Users only"}
+    assert response.json() == {"detail": "Access denied: Not for users"}
 
 
 @pytest.mark.asyncio

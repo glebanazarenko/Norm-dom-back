@@ -41,10 +41,10 @@ async def add_review_to_house_with_logic(
 
 
 async def get_searched_houses(
-    query: str, page: int = 1, per_page: int = 10
+    query: str, page: int = 1, per_page: int = 100
 ) -> List[HouseOutSchema]:
-    if not query:
-        raise HTTPException(status_code=400, detail="Пустой запрос")
+    # if not query:
+    #     raise HTTPException(status_code=400, detail="Пустой запрос")
 
     houses = await get_house(query, page, per_page)
 

@@ -118,6 +118,10 @@ async def house(adm_area, district):
         simple_address="Test Simple Address",
         adm_area=adm_area,  # Указываем связанный AdmArea
         district=district,  # Указываем связанный District
+        geodata_center="POINT (37.6173 55.7558)", 
+        kad_n="1234567890",  # Добавьте, если требуется
+        kad_zu="0987654321",
+        geo_data="Some geo data",
     )
     return house_instance
 

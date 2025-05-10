@@ -34,6 +34,12 @@ async def is_super_user(user: UserOutSchema):
         raise HTTPException(status_code=403, detail="Access denied: Super Users only")
     return user_data
 
+async def is_not_user(user: UserOutSchema):
+    user_data = await get_user(user.username)
+    if not user_data or user_data.role_name == "User":
+        raise HTTPException(status_code=403, detail="Access denied: Not for users")
+    return user_data
+
 
 async def create_user_with_logic(user: UserInSchema) -> UserOutSchema:
     user.password = pwd_context.hash(user.password)
