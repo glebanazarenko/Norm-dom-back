@@ -1,6 +1,7 @@
-import pytest
-from uuid import uuid4
 from unittest.mock import AsyncMock
+from uuid import uuid4
+
+import pytest
 from httpx import AsyncClient
 
 
@@ -107,4 +108,3 @@ async def test_get_house_by_id_not_found(client):
 async def test_get_house_by_id_invalid_uuid(client):
     response = await client.get("/house/invalid-uuid")
     assert response.status_code == 422, f"Ошибка: {response.json()}"
-

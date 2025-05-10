@@ -1,11 +1,10 @@
-from tortoise.contrib.pydantic import pydantic_model_creator
-
-from src.database.models import Review
-
 from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel
+from tortoise.contrib.pydantic import pydantic_model_creator
+
+from src.database.models import Review
 
 
 class EditReviewSchema(BaseModel):
@@ -40,8 +39,10 @@ ReviewSchema = pydantic_model_creator(
     exclude=("user",),
 )
 
+
 class ReviewListResponse(BaseModel):
     reviews: list[ReviewSchema]
+
 
 class PendingReviewSchema(BaseModel):
     id: str

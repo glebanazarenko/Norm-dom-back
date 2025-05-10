@@ -1,7 +1,7 @@
 import asyncio
 import json
-from pathlib import Path
 from decimal import Decimal
+from pathlib import Path
 
 from tortoise import Tortoise, run_async
 
@@ -86,7 +86,7 @@ def get_latest_json_file() -> str | None:
     """
     # Define the target directory (adjust based on script location)
     directory = Path(__file__).parent.parent / "json"
-    
+
     if not directory.exists():
         logger.warning(f"Directory {directory} does not exist.")
         return None

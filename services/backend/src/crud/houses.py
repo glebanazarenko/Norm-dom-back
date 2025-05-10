@@ -1,20 +1,20 @@
+import re
 from typing import List
 from uuid import UUID
-import re
 
+import tortoise
 from fastapi import HTTPException
 from tortoise.expressions import Q
 from tortoise.functions import Avg
-import tortoise
 
 from src.database.models import House, Review
-from src.schemas.houses import HouseOutSchema, HouseOutOneSchema
+from src.schemas.houses import HouseOutOneSchema, HouseOutSchema
 
 
 async def get_house(
     query: str, page: int = 1, per_page: int = 10
 ) -> List[HouseOutSchema]:
-    print(f"[DEBUG] Получен запрос: {query}")  
+    print(f"[DEBUG] Получен запрос: {query}")
 
     offset = (page - 1) * per_page
     houses = (
@@ -37,8 +37,8 @@ async def get_house(
     result = []
     for house in houses:
         published_reviews = await Review.filter(house=house, is_published=True).all()
-        avg_rating = '0'
-        total = '0'
+        avg_rating = "0"
+        total = "0"
         if published_reviews:
             total = sum(review.rating for review in published_reviews)
             avg_rating = total / len(published_reviews)
@@ -73,10 +73,10 @@ async def get_house_by_id(house_id: UUID) -> HouseOutOneSchema:
 
     if not house:
         raise HTTPException(status_code=404, detail="Дом не найден")
-    
+
     published_reviews = await Review.filter(house=house, is_published=True).all()
-    avg_rating = '0'
-    total = '0'
+    avg_rating = "0"
+    total = "0"
     if published_reviews:
         total = sum(review.rating for review in published_reviews)
         avg_rating = total / len(published_reviews)

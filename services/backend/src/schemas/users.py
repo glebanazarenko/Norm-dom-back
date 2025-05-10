@@ -1,9 +1,10 @@
+from datetime import datetime
+from uuid import UUID
+
 from pydantic import BaseModel
 from tortoise.contrib.pydantic import pydantic_model_creator
 
 from src.database.models import User
-from datetime import datetime
-from uuid import UUID
 
 UserInSchema = pydantic_model_creator(
     User,

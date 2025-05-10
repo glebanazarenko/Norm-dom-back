@@ -8,7 +8,7 @@ import src.crud.reviews as crud_reviews
 import src.crud.users as crud_user
 from src.crud.houses import get_house, get_house_by_id, get_or_none
 from src.main import logger
-from src.schemas.houses import HouseOutSchema, HouseOutOneSchema, HouseOutReviewSchema
+from src.schemas.houses import HouseOutOneSchema, HouseOutReviewSchema, HouseOutSchema
 from src.schemas.users import UserOutSchema
 
 
@@ -37,26 +37,20 @@ async def add_review_to_house_with_logic(
 
     # Обновляем дом с новым списком отзывов
     await house.fetch_related("reviews")  # Получаем связанные отзывы
-    return await HouseOutReviewSchema.from_tortoise_orm(house)  # Возвращаем обновленный дом
+    return await HouseOutReviewSchema.from_tortoise_orm(
+        house
+    )  # Возвращаем обновленный дом
 
 
 async def get_searched_houses(
     query: str, page: int = 1, per_page: int = 100
 ) -> List[HouseOutSchema]:
-    # if not query:
-    #     raise HTTPException(status_code=400, detail="Пустой запрос")
-
     houses = await get_house(query, page, per_page)
 
     if not houses:
         raise HTTPException(status_code=404, detail="Нет такого дома")
-    
+
     return houses
-
-    # logger.info(f"Дома {houses}")
-
-    # # Используем HouseOutSchema для сериализации данных
-    # return [await HouseOutSchema.from_tortoise_orm(house) for house in houses]
 
 
 async def get_house_by_id_with_logic(house_id: UUID) -> HouseOutOneSchema:
@@ -66,13 +60,6 @@ async def get_house_by_id_with_logic(house_id: UUID) -> HouseOutOneSchema:
     if not house:
         raise HTTPException(status_code=404, detail="Дом не найден")
 
-    # Дополнительная бизнес-логика
-    # Например: логируем запрос
     print(f"[INFO] Получен дом с ID: {house.id}")
 
     return house
-
-    # Можно добавить проверки, права доступа, кэширование и т.д.
-
-    # Сериализуем модель в Pydantic
-    # return await HouseOutSchema.from_tortoise_orm(house)

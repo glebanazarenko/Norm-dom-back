@@ -4,19 +4,19 @@ from fastapi import HTTPException
 from passlib.context import CryptContext
 from tortoise.exceptions import DoesNotExist, IntegrityError
 
+from src.crud.reviews import get_reviews_by_user
 from src.crud.roles import get_role
 from src.crud.users import (
     create_user_in_db,
     delete_user_by_id,
     get,
     get_first_user,
-    get_user,
     get_or_none,
+    get_user,
 )
-from src.crud.reviews import get_reviews_by_user
+from src.schemas.reviews import ReviewSchema
 from src.schemas.token import Status
 from src.schemas.users import UserFrontSchema, UserInSchema, UserOutSchema
-from src.schemas.reviews import ReviewSchema
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -33,6 +33,7 @@ async def is_super_user(user: UserOutSchema):
     if not user_data or user_data.role_name != "Super User":
         raise HTTPException(status_code=403, detail="Access denied: Super Users only")
     return user_data
+
 
 async def is_not_user(user: UserOutSchema):
     user_data = await get_user(user.username)
@@ -82,6 +83,7 @@ async def delete_user_with_logic(user_id: UUID, current_user_id: UUID) -> Status
         return Status(message=f"Deleted user {user_id}")  # UPDATED
 
     raise HTTPException(status_code=403, detail=f"Not authorized to delete")
+
 
 async def get_user_reviews(user_id: UUID) -> list[ReviewSchema]:
     user = await get_or_none(id=user_id)

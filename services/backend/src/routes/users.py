@@ -1,7 +1,7 @@
 import uuid
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status, Path
+from fastapi import APIRouter, Depends, HTTPException, Path, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -13,14 +13,14 @@ from src.auth.jwthandler import (
     get_current_user,
 )
 from src.auth.users import validate_user
+from src.schemas.reviews import ReviewListResponse
 from src.schemas.token import Status
 from src.schemas.users import UserFrontSchema, UserInSchema, UserOutSchema
-from src.schemas.reviews import ReviewListResponse
 from src.services.users import (
     create_user_with_logic,
     delete_user_with_logic,
-    get_user_with_logic,
     get_user_reviews,
+    get_user_with_logic,
 )
 
 router = APIRouter()
@@ -121,7 +121,7 @@ async def delete_user(
 )
 async def read_user_reviews(
     user_id: uuid.UUID = Path(..., description="ID пользователя"),
-    current_user: UserOutSchema = Depends(get_current_user)  # опционально
+    current_user: UserOutSchema = Depends(get_current_user),  # опционально
 ):
     try:
         reviews = await get_user_reviews(user_id)
